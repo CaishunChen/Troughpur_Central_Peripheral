@@ -1,0 +1,5 @@
+C:\Users\Helon\Desktop\Troughpur_Central_Peripheral\Troughput_Central_Peripheral.cydsn\Troughput_Central_Peripheral.cyprj|e17b3cbf-8cb1-48bb-9b32-effebac20128
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|996dd82a-558c-4e33-a780-9dbeca18af6e
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|7b5f4808-59a5-4a8a-b723-b58c4bbdc34c
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|af3be745-93e7-40b3-95d5-999c75846ed3
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|c31c5937-f279-4307-8154-b59075d52768

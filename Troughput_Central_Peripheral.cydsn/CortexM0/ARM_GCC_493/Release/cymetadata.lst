@@ -1,0 +1,554 @@
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"cymetadata.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	cy_meta_chipprotect
+  18              		.global	cy_metadata
+  19              		.global	cy_meta_flashprotect
+  20              		.section	.cychipprotect,"a",%progbits
+  21              		.type	cy_meta_chipprotect, %object
+  22              		.size	cy_meta_chipprotect, 1
+  23              	cy_meta_chipprotect:
+  24 0000 01       		.byte	1
+  25              		.section	.cymeta,"a",%progbits
+  26              		.type	cy_metadata, %object
+  27              		.size	cy_metadata, 12
+  28              	cy_metadata:
+  29 0000 00       		.byte	0
+  30 0001 02       		.byte	2
+  31 0002 0E       		.byte	14
+  32 0003 09       		.byte	9
+  33 0004 11       		.byte	17
+  34 0005 9E       		.byte	-98
+  35 0006 00       		.byte	0
+  36 0007 00       		.byte	0
+  37 0008 00       		.byte	0
+  38 0009 00       		.byte	0
+  39 000a 00       		.byte	0
+  40 000b 00       		.byte	0
+  41              		.section	.cyflashprotect,"a",%progbits
+  42              		.type	cy_meta_flashprotect, %object
+  43              		.size	cy_meta_flashprotect, 128
+  44              	cy_meta_flashprotect:
+  45 0000 FF       		.byte	-1
+  46 0001 FF       		.byte	-1
+  47 0002 FF       		.byte	-1
+  48 0003 FF       		.byte	-1
+  49 0004 FF       		.byte	-1
+  50 0005 FF       		.byte	-1
+  51 0006 FF       		.byte	-1
+  52 0007 FF       		.byte	-1
+  53 0008 FF       		.byte	-1
+  54 0009 FF       		.byte	-1
+  55 000a FF       		.byte	-1
+  56 000b FF       		.byte	-1
+  57 000c FF       		.byte	-1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 2
+
+
+  58 000d FF       		.byte	-1
+  59 000e FF       		.byte	-1
+  60 000f FF       		.byte	-1
+  61 0010 FF       		.byte	-1
+  62 0011 FF       		.byte	-1
+  63 0012 FF       		.byte	-1
+  64 0013 FF       		.byte	-1
+  65 0014 FF       		.byte	-1
+  66 0015 FF       		.byte	-1
+  67 0016 FF       		.byte	-1
+  68 0017 FF       		.byte	-1
+  69 0018 FF       		.byte	-1
+  70 0019 FF       		.byte	-1
+  71 001a FF       		.byte	-1
+  72 001b FF       		.byte	-1
+  73 001c FF       		.byte	-1
+  74 001d FF       		.byte	-1
+  75 001e FF       		.byte	-1
+  76 001f FF       		.byte	-1
+  77 0020 FF       		.byte	-1
+  78 0021 FF       		.byte	-1
+  79 0022 FF       		.byte	-1
+  80 0023 FF       		.byte	-1
+  81 0024 FF       		.byte	-1
+  82 0025 FF       		.byte	-1
+  83 0026 FF       		.byte	-1
+  84 0027 FF       		.byte	-1
+  85 0028 FF       		.byte	-1
+  86 0029 FF       		.byte	-1
+  87 002a FF       		.byte	-1
+  88 002b FF       		.byte	-1
+  89 002c FF       		.byte	-1
+  90 002d FF       		.byte	-1
+  91 002e FF       		.byte	-1
+  92 002f FF       		.byte	-1
+  93 0030 FF       		.byte	-1
+  94 0031 FF       		.byte	-1
+  95 0032 FF       		.byte	-1
+  96 0033 FF       		.byte	-1
+  97 0034 FF       		.byte	-1
+  98 0035 FF       		.byte	-1
+  99 0036 FF       		.byte	-1
+ 100 0037 FF       		.byte	-1
+ 101 0038 FF       		.byte	-1
+ 102 0039 FF       		.byte	-1
+ 103 003a FF       		.byte	-1
+ 104 003b FF       		.byte	-1
+ 105 003c FF       		.byte	-1
+ 106 003d FF       		.byte	-1
+ 107 003e FF       		.byte	-1
+ 108 003f FF       		.byte	-1
+ 109 0040 FF       		.byte	-1
+ 110 0041 FF       		.byte	-1
+ 111 0042 FF       		.byte	-1
+ 112 0043 FF       		.byte	-1
+ 113 0044 FF       		.byte	-1
+ 114 0045 FF       		.byte	-1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 3
+
+
+ 115 0046 FF       		.byte	-1
+ 116 0047 FF       		.byte	-1
+ 117 0048 FF       		.byte	-1
+ 118 0049 FF       		.byte	-1
+ 119 004a FF       		.byte	-1
+ 120 004b FF       		.byte	-1
+ 121 004c FF       		.byte	-1
+ 122 004d FF       		.byte	-1
+ 123 004e FF       		.byte	-1
+ 124 004f FF       		.byte	-1
+ 125 0050 FF       		.byte	-1
+ 126 0051 FF       		.byte	-1
+ 127 0052 FF       		.byte	-1
+ 128 0053 FF       		.byte	-1
+ 129 0054 FF       		.byte	-1
+ 130 0055 FF       		.byte	-1
+ 131 0056 FF       		.byte	-1
+ 132 0057 FF       		.byte	-1
+ 133 0058 FF       		.byte	-1
+ 134 0059 FF       		.byte	-1
+ 135 005a FF       		.byte	-1
+ 136 005b FF       		.byte	-1
+ 137 005c FF       		.byte	-1
+ 138 005d FF       		.byte	-1
+ 139 005e FF       		.byte	-1
+ 140 005f FF       		.byte	-1
+ 141 0060 FF       		.byte	-1
+ 142 0061 FF       		.byte	-1
+ 143 0062 FF       		.byte	-1
+ 144 0063 FF       		.byte	-1
+ 145 0064 FF       		.byte	-1
+ 146 0065 FF       		.byte	-1
+ 147 0066 FF       		.byte	-1
+ 148 0067 FF       		.byte	-1
+ 149 0068 FF       		.byte	-1
+ 150 0069 FF       		.byte	-1
+ 151 006a FF       		.byte	-1
+ 152 006b FF       		.byte	-1
+ 153 006c FF       		.byte	-1
+ 154 006d FF       		.byte	-1
+ 155 006e FF       		.byte	-1
+ 156 006f FF       		.byte	-1
+ 157 0070 FF       		.byte	-1
+ 158 0071 FF       		.byte	-1
+ 159 0072 FF       		.byte	-1
+ 160 0073 FF       		.byte	-1
+ 161 0074 FF       		.byte	-1
+ 162 0075 FF       		.byte	-1
+ 163 0076 FF       		.byte	-1
+ 164 0077 FF       		.byte	-1
+ 165 0078 FF       		.byte	-1
+ 166 0079 FF       		.byte	-1
+ 167 007a FF       		.byte	-1
+ 168 007b FF       		.byte	-1
+ 169 007c FF       		.byte	-1
+ 170 007d FF       		.byte	-1
+ 171 007e FF       		.byte	-1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 4
+
+
+ 172 007f FF       		.byte	-1
+ 173              		.text
+ 174              	.Letext0:
+ 175              		.file 1 "Generated_Source\\PSoC4\\cymetadata.c"
+ 176              		.file 2 "Generated_Source\\PSoC4\\cytypes.h"
+ 177              		.section	.debug_info,"",%progbits
+ 178              	.Ldebug_info0:
+ 179 0000 FA000000 		.4byte	0xfa
+ 180 0004 0400     		.2byte	0x4
+ 181 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 182 000a 04       		.byte	0x4
+ 183 000b 01       		.uleb128 0x1
+ 184 000c 14000000 		.4byte	.LASF16
+ 185 0010 01       		.byte	0x1
+ 186 0011 C2000000 		.4byte	.LASF17
+ 187 0015 0B010000 		.4byte	.LASF18
+ 188 0019 00000000 		.4byte	.Ldebug_line0
+ 189 001d 02       		.uleb128 0x2
+ 190 001e 01       		.byte	0x1
+ 191 001f 06       		.byte	0x6
+ 192 0020 D7010000 		.4byte	.LASF0
+ 193 0024 02       		.uleb128 0x2
+ 194 0025 01       		.byte	0x1
+ 195 0026 08       		.byte	0x8
+ 196 0027 B4000000 		.4byte	.LASF1
+ 197 002b 02       		.uleb128 0x2
+ 198 002c 02       		.byte	0x2
+ 199 002d 05       		.byte	0x5
+ 200 002e BE010000 		.4byte	.LASF2
+ 201 0032 02       		.uleb128 0x2
+ 202 0033 02       		.byte	0x2
+ 203 0034 07       		.byte	0x7
+ 204 0035 F8000000 		.4byte	.LASF3
+ 205 0039 02       		.uleb128 0x2
+ 206 003a 04       		.byte	0x4
+ 207 003b 05       		.byte	0x5
+ 208 003c CE010000 		.4byte	.LASF4
+ 209 0040 02       		.uleb128 0x2
+ 210 0041 04       		.byte	0x4
+ 211 0042 07       		.byte	0x7
+ 212 0043 E6000000 		.4byte	.LASF5
+ 213 0047 02       		.uleb128 0x2
+ 214 0048 08       		.byte	0x8
+ 215 0049 05       		.byte	0x5
+ 216 004a AB010000 		.4byte	.LASF6
+ 217 004e 02       		.uleb128 0x2
+ 218 004f 08       		.byte	0x8
+ 219 0050 07       		.byte	0x7
+ 220 0051 76010000 		.4byte	.LASF7
+ 221 0055 03       		.uleb128 0x3
+ 222 0056 04       		.byte	0x4
+ 223 0057 05       		.byte	0x5
+ 224 0058 696E7400 		.ascii	"int\000"
+ 225 005c 02       		.uleb128 0x2
+ 226 005d 04       		.byte	0x4
+ 227 005e 07       		.byte	0x7
+ 228 005f 69010000 		.4byte	.LASF8
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 5
+
+
+ 229 0063 04       		.uleb128 0x4
+ 230 0064 C8010000 		.4byte	.LASF19
+ 231 0068 02       		.byte	0x2
+ 232 0069 3801     		.2byte	0x138
+ 233 006b 24000000 		.4byte	0x24
+ 234 006f 02       		.uleb128 0x2
+ 235 0070 04       		.byte	0x4
+ 236 0071 04       		.byte	0x4
+ 237 0072 AE000000 		.4byte	.LASF9
+ 238 0076 02       		.uleb128 0x2
+ 239 0077 08       		.byte	0x8
+ 240 0078 04       		.byte	0x4
+ 241 0079 62010000 		.4byte	.LASF10
+ 242 007d 02       		.uleb128 0x2
+ 243 007e 01       		.byte	0x1
+ 244 007f 08       		.byte	0x8
+ 245 0080 B9010000 		.4byte	.LASF11
+ 246 0084 05       		.uleb128 0x5
+ 247 0085 63000000 		.4byte	0x63
+ 248 0089 94000000 		.4byte	0x94
+ 249 008d 06       		.uleb128 0x6
+ 250 008e 94000000 		.4byte	0x94
+ 251 0092 7F       		.byte	0x7f
+ 252 0093 00       		.byte	0
+ 253 0094 02       		.uleb128 0x2
+ 254 0095 04       		.byte	0x4
+ 255 0096 07       		.byte	0x7
+ 256 0097 A2010000 		.4byte	.LASF12
+ 257 009b 07       		.uleb128 0x7
+ 258 009c 8D010000 		.4byte	.LASF13
+ 259 00a0 01       		.byte	0x1
+ 260 00a1 1F       		.byte	0x1f
+ 261 00a2 AC000000 		.4byte	0xac
+ 262 00a6 05       		.uleb128 0x5
+ 263 00a7 03       		.byte	0x3
+ 264 00a8 00000000 		.4byte	cy_meta_flashprotect
+ 265 00ac 08       		.uleb128 0x8
+ 266 00ad 84000000 		.4byte	0x84
+ 267 00b1 05       		.uleb128 0x5
+ 268 00b2 63000000 		.4byte	0x63
+ 269 00b6 C1000000 		.4byte	0xc1
+ 270 00ba 06       		.uleb128 0x6
+ 271 00bb 94000000 		.4byte	0x94
+ 272 00bf 0B       		.byte	0xb
+ 273 00c0 00       		.byte	0
+ 274 00c1 07       		.uleb128 0x7
+ 275 00c2 A2000000 		.4byte	.LASF14
+ 276 00c6 01       		.byte	0x1
+ 277 00c7 3C       		.byte	0x3c
+ 278 00c8 D2000000 		.4byte	0xd2
+ 279 00cc 05       		.uleb128 0x5
+ 280 00cd 03       		.byte	0x3
+ 281 00ce 00000000 		.4byte	cy_metadata
+ 282 00d2 08       		.uleb128 0x8
+ 283 00d3 B1000000 		.4byte	0xb1
+ 284 00d7 05       		.uleb128 0x5
+ 285 00d8 63000000 		.4byte	0x63
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 6
+
+
+ 286 00dc E7000000 		.4byte	0xe7
+ 287 00e0 06       		.uleb128 0x6
+ 288 00e1 94000000 		.4byte	0x94
+ 289 00e5 00       		.byte	0
+ 290 00e6 00       		.byte	0
+ 291 00e7 07       		.uleb128 0x7
+ 292 00e8 00000000 		.4byte	.LASF15
+ 293 00ec 01       		.byte	0x1
+ 294 00ed 4B       		.byte	0x4b
+ 295 00ee F8000000 		.4byte	0xf8
+ 296 00f2 05       		.uleb128 0x5
+ 297 00f3 03       		.byte	0x3
+ 298 00f4 00000000 		.4byte	cy_meta_chipprotect
+ 299 00f8 08       		.uleb128 0x8
+ 300 00f9 D7000000 		.4byte	0xd7
+ 301 00fd 00       		.byte	0
+ 302              		.section	.debug_abbrev,"",%progbits
+ 303              	.Ldebug_abbrev0:
+ 304 0000 01       		.uleb128 0x1
+ 305 0001 11       		.uleb128 0x11
+ 306 0002 01       		.byte	0x1
+ 307 0003 25       		.uleb128 0x25
+ 308 0004 0E       		.uleb128 0xe
+ 309 0005 13       		.uleb128 0x13
+ 310 0006 0B       		.uleb128 0xb
+ 311 0007 03       		.uleb128 0x3
+ 312 0008 0E       		.uleb128 0xe
+ 313 0009 1B       		.uleb128 0x1b
+ 314 000a 0E       		.uleb128 0xe
+ 315 000b 10       		.uleb128 0x10
+ 316 000c 17       		.uleb128 0x17
+ 317 000d 00       		.byte	0
+ 318 000e 00       		.byte	0
+ 319 000f 02       		.uleb128 0x2
+ 320 0010 24       		.uleb128 0x24
+ 321 0011 00       		.byte	0
+ 322 0012 0B       		.uleb128 0xb
+ 323 0013 0B       		.uleb128 0xb
+ 324 0014 3E       		.uleb128 0x3e
+ 325 0015 0B       		.uleb128 0xb
+ 326 0016 03       		.uleb128 0x3
+ 327 0017 0E       		.uleb128 0xe
+ 328 0018 00       		.byte	0
+ 329 0019 00       		.byte	0
+ 330 001a 03       		.uleb128 0x3
+ 331 001b 24       		.uleb128 0x24
+ 332 001c 00       		.byte	0
+ 333 001d 0B       		.uleb128 0xb
+ 334 001e 0B       		.uleb128 0xb
+ 335 001f 3E       		.uleb128 0x3e
+ 336 0020 0B       		.uleb128 0xb
+ 337 0021 03       		.uleb128 0x3
+ 338 0022 08       		.uleb128 0x8
+ 339 0023 00       		.byte	0
+ 340 0024 00       		.byte	0
+ 341 0025 04       		.uleb128 0x4
+ 342 0026 16       		.uleb128 0x16
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 7
+
+
+ 343 0027 00       		.byte	0
+ 344 0028 03       		.uleb128 0x3
+ 345 0029 0E       		.uleb128 0xe
+ 346 002a 3A       		.uleb128 0x3a
+ 347 002b 0B       		.uleb128 0xb
+ 348 002c 3B       		.uleb128 0x3b
+ 349 002d 05       		.uleb128 0x5
+ 350 002e 49       		.uleb128 0x49
+ 351 002f 13       		.uleb128 0x13
+ 352 0030 00       		.byte	0
+ 353 0031 00       		.byte	0
+ 354 0032 05       		.uleb128 0x5
+ 355 0033 01       		.uleb128 0x1
+ 356 0034 01       		.byte	0x1
+ 357 0035 49       		.uleb128 0x49
+ 358 0036 13       		.uleb128 0x13
+ 359 0037 01       		.uleb128 0x1
+ 360 0038 13       		.uleb128 0x13
+ 361 0039 00       		.byte	0
+ 362 003a 00       		.byte	0
+ 363 003b 06       		.uleb128 0x6
+ 364 003c 21       		.uleb128 0x21
+ 365 003d 00       		.byte	0
+ 366 003e 49       		.uleb128 0x49
+ 367 003f 13       		.uleb128 0x13
+ 368 0040 2F       		.uleb128 0x2f
+ 369 0041 0B       		.uleb128 0xb
+ 370 0042 00       		.byte	0
+ 371 0043 00       		.byte	0
+ 372 0044 07       		.uleb128 0x7
+ 373 0045 34       		.uleb128 0x34
+ 374 0046 00       		.byte	0
+ 375 0047 03       		.uleb128 0x3
+ 376 0048 0E       		.uleb128 0xe
+ 377 0049 3A       		.uleb128 0x3a
+ 378 004a 0B       		.uleb128 0xb
+ 379 004b 3B       		.uleb128 0x3b
+ 380 004c 0B       		.uleb128 0xb
+ 381 004d 49       		.uleb128 0x49
+ 382 004e 13       		.uleb128 0x13
+ 383 004f 3F       		.uleb128 0x3f
+ 384 0050 19       		.uleb128 0x19
+ 385 0051 02       		.uleb128 0x2
+ 386 0052 18       		.uleb128 0x18
+ 387 0053 00       		.byte	0
+ 388 0054 00       		.byte	0
+ 389 0055 08       		.uleb128 0x8
+ 390 0056 26       		.uleb128 0x26
+ 391 0057 00       		.byte	0
+ 392 0058 49       		.uleb128 0x49
+ 393 0059 13       		.uleb128 0x13
+ 394 005a 00       		.byte	0
+ 395 005b 00       		.byte	0
+ 396 005c 00       		.byte	0
+ 397              		.section	.debug_aranges,"",%progbits
+ 398 0000 14000000 		.4byte	0x14
+ 399 0004 0200     		.2byte	0x2
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 8
+
+
+ 400 0006 00000000 		.4byte	.Ldebug_info0
+ 401 000a 04       		.byte	0x4
+ 402 000b 00       		.byte	0
+ 403 000c 0000     		.2byte	0
+ 404 000e 0000     		.2byte	0
+ 405 0010 00000000 		.4byte	0
+ 406 0014 00000000 		.4byte	0
+ 407              		.section	.debug_line,"",%progbits
+ 408              	.Ldebug_line0:
+ 409 0000 4D000000 		.section	.debug_str,"MS",%progbits,1
+ 409      02004700 
+ 409      00000201 
+ 409      FB0E0D00 
+ 409      01010101 
+ 410              	.LASF15:
+ 411 0000 63795F6D 		.ascii	"cy_meta_chipprotect\000"
+ 411      6574615F 
+ 411      63686970 
+ 411      70726F74 
+ 411      65637400 
+ 412              	.LASF16:
+ 413 0014 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 413      4320342E 
+ 413      392E3320 
+ 413      32303135 
+ 413      30333033 
+ 414 0047 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m0 -mthumb -g -O"
+ 414      20726576 
+ 414      6973696F 
+ 414      6E203232 
+ 414      31323230 
+ 415 007a 73202D66 		.ascii	"s -ffunction-sections -ffat-lto-objects\000"
+ 415      66756E63 
+ 415      74696F6E 
+ 415      2D736563 
+ 415      74696F6E 
+ 416              	.LASF14:
+ 417 00a2 63795F6D 		.ascii	"cy_metadata\000"
+ 417      65746164 
+ 417      61746100 
+ 418              	.LASF9:
+ 419 00ae 666C6F61 		.ascii	"float\000"
+ 419      7400
+ 420              	.LASF1:
+ 421 00b4 756E7369 		.ascii	"unsigned char\000"
+ 421      676E6564 
+ 421      20636861 
+ 421      7200
+ 422              	.LASF17:
+ 423 00c2 47656E65 		.ascii	"Generated_Source\\PSoC4\\cymetadata.c\000"
+ 423      72617465 
+ 423      645F536F 
+ 423      75726365 
+ 423      5C50536F 
+ 424              	.LASF5:
+ 425 00e6 6C6F6E67 		.ascii	"long unsigned int\000"
+ 425      20756E73 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 9
+
+
+ 425      69676E65 
+ 425      6420696E 
+ 425      7400
+ 426              	.LASF3:
+ 427 00f8 73686F72 		.ascii	"short unsigned int\000"
+ 427      7420756E 
+ 427      7369676E 
+ 427      65642069 
+ 427      6E7400
+ 428              	.LASF18:
+ 429 010b 433A5C55 		.ascii	"C:\\Users\\Helon\\Desktop\\Troughpur_Central_Periph"
+ 429      73657273 
+ 429      5C48656C 
+ 429      6F6E5C44 
+ 429      65736B74 
+ 430 013a 6572616C 		.ascii	"eral\\Troughput_Central_Peripheral.cydsn\000"
+ 430      5C54726F 
+ 430      75676870 
+ 430      75745F43 
+ 430      656E7472 
+ 431              	.LASF10:
+ 432 0162 646F7562 		.ascii	"double\000"
+ 432      6C6500
+ 433              	.LASF8:
+ 434 0169 756E7369 		.ascii	"unsigned int\000"
+ 434      676E6564 
+ 434      20696E74 
+ 434      00
+ 435              	.LASF7:
+ 436 0176 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 436      206C6F6E 
+ 436      6720756E 
+ 436      7369676E 
+ 436      65642069 
+ 437              	.LASF13:
+ 438 018d 63795F6D 		.ascii	"cy_meta_flashprotect\000"
+ 438      6574615F 
+ 438      666C6173 
+ 438      6870726F 
+ 438      74656374 
+ 439              	.LASF12:
+ 440 01a2 73697A65 		.ascii	"sizetype\000"
+ 440      74797065 
+ 440      00
+ 441              	.LASF6:
+ 442 01ab 6C6F6E67 		.ascii	"long long int\000"
+ 442      206C6F6E 
+ 442      6720696E 
+ 442      7400
+ 443              	.LASF11:
+ 444 01b9 63686172 		.ascii	"char\000"
+ 444      00
+ 445              	.LASF2:
+ 446 01be 73686F72 		.ascii	"short int\000"
+ 446      7420696E 
+ 446      7400
+ 447              	.LASF19:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccKcMIzN.s 			page 10
+
+
+ 448 01c8 75696E74 		.ascii	"uint8\000"
+ 448      3800
+ 449              	.LASF4:
+ 450 01ce 6C6F6E67 		.ascii	"long int\000"
+ 450      20696E74 
+ 450      00
+ 451              	.LASF0:
+ 452 01d7 7369676E 		.ascii	"signed char\000"
+ 452      65642063 
+ 452      68617200 
+ 453              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

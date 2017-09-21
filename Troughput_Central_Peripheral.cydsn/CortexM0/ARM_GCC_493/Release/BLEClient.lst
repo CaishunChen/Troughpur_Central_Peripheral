@@ -1,0 +1,4243 @@
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"BLEClient.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.Parser_adv_data_scan_data,"ax",%progbits
+  18              		.align	1
+  19              		.global	Parser_adv_data_scan_data
+  20              		.code	16
+  21              		.thumb_func
+  22              		.type	Parser_adv_data_scan_data, %function
+  23              	Parser_adv_data_scan_data:
+  24              	.LFB38:
+  25              		.file 1 "BLEClient.c"
+   1:BLEClient.c   **** /* ========================================
+   2:BLEClient.c   ****  *
+   3:BLEClient.c   ****  * Copyright YOUR COMPANY, THE YEAR
+   4:BLEClient.c   ****  * All Rights Reserved
+   5:BLEClient.c   ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:BLEClient.c   ****  *
+   7:BLEClient.c   ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:BLEClient.c   ****  * WHICH IS THE PROPERTY OF your company.
+   9:BLEClient.c   ****  *
+  10:BLEClient.c   ****  * ========================================
+  11:BLEClient.c   **** */
+  12:BLEClient.c   **** #include <project.h> 
+  13:BLEClient.c   **** #include "BLEClient.h"
+  14:BLEClient.c   **** #include "BLEApplication.h"
+  15:BLEClient.c   **** #include <stdio.h>
+  16:BLEClient.c   **** /***************************************
+  17:BLEClient.c   **** * 全局变量
+  18:BLEClient.c   **** ***************************************/
+  19:BLEClient.c   **** //uint8_t StartScan=FALSE;
+  20:BLEClient.c   **** //uint8_t DeviceList[DeviceListCount]={0};
+  21:BLEClient.c   **** CYBLE_DEVICE_INFO DeviceInfo[DeviceListCount];
+  22:BLEClient.c   **** //  计数扫描到的BLE设备
+  23:BLEClient.c   **** uint8_t DeviceCount=0;
+  24:BLEClient.c   **** uint8_t flag=0;
+  25:BLEClient.c   **** extern CYBLE_GATTC_WRITE_REQ_T writeRequestData;
+  26:BLEClient.c   **** extern uint8_t STOP_SCAN_FLAG;
+  27:BLEClient.c   **** /******************************************************************************
+  28:BLEClient.c   **** * Function Name: HandleScanDevices
+  29:BLEClient.c   **** ***************************************************************************//**
+  30:BLEClient.c   **** * 
+  31:BLEClient.c   **** *  处理扫描到的周边BLE设备
+  32:BLEClient.c   **** * 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 2
+
+
+  33:BLEClient.c   **** * \return
+  34:BLEClient.c   **** *  None
+  35:BLEClient.c   **** * 
+  36:BLEClient.c   **** ******************************************************************************/
+  37:BLEClient.c   **** void HandleScanDevices(CYBLE_GAPC_ADV_REPORT_T* ScanReport)
+  38:BLEClient.c   **** {
+  39:BLEClient.c   **** //    printf("Advertising or Scan Response Data is 0x%02X%02X%02X%02X%02X%02X\r\n",
+  40:BLEClient.c   **** //            );
+  41:BLEClient.c   ****     uint8_t i=0;
+  42:BLEClient.c   ****     CYBLE_API_RESULT_T API_RESULT=0;
+  43:BLEClient.c   **** //    第一次扫描时,保存第一次扫描到的设备地址
+  44:BLEClient.c   ****     if(flag^1)
+  45:BLEClient.c   ****     {           
+  46:BLEClient.c   ****         flag=1;   
+  47:BLEClient.c   ****         if(CYBLE_GAPC_CONN_UNDIRECTED_ADV==ScanReport->eventType)   
+  48:BLEClient.c   ****         {
+  49:BLEClient.c   ****             DeviceCount++;
+  50:BLEClient.c   ****             memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+  51:BLEClient.c   ****             if(CYBLE_GAP_ADDR_TYPE_PUBLIC==ScanReport->peerAddrType)
+  52:BLEClient.c   ****             {
+  53:BLEClient.c   ****                 DeviceInfo[DeviceCount-1].DeviceList.type=CYBLE_GAP_ADDR_TYPE_PUBLIC;
+  54:BLEClient.c   **** //                DeviceInfo[DeviceCount-1].DeviceList.type='P';
+  55:BLEClient.c   ****             }
+  56:BLEClient.c   ****             else
+  57:BLEClient.c   ****             {
+  58:BLEClient.c   ****                 DeviceInfo[DeviceCount-1].DeviceList.type=CYBLE_GAP_ADDR_TYPE_RANDOM;
+  59:BLEClient.c   **** //                DeviceInfo[DeviceCount-1].DeviceList.type='R';
+  60:BLEClient.c   ****             }
+  61:BLEClient.c   ****             DeviceInfo[DeviceCount-1].idx=DeviceCount;
+  62:BLEClient.c   ****             DeviceInfo[DeviceCount-1].rssi=ScanReport->rssi;
+  63:BLEClient.c   ****             memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+  64:BLEClient.c   ****             Parser_adv_data_scan_data(ScanReport->data,ScanReport->dataLen);
+  65:BLEClient.c   ****             if(DeviceInfo[DeviceCount-1].ScanName)
+  66:BLEClient.c   ****             {
+  67:BLEClient.c   ****                 DeviceInfo[DeviceCount-1].ScanName=FALSE;
+  68:BLEClient.c   ****             }
+  69:BLEClient.c   ****             else
+  70:BLEClient.c   ****             {
+  71:BLEClient.c   ****                 memset(DeviceInfo[DeviceCount-1].DeviceName,0,sizeof(DeviceInfo[DeviceCount-1].Devi
+  72:BLEClient.c   ****                 memcpy(DeviceInfo[DeviceCount-1].DeviceName,"NULL",sizeof("NULL"));
+  73:BLEClient.c   ****             }
+  74:BLEClient.c   **** //            printf("+SCAN=%d,%d,%c,%02X%02X%02X%02X%02X%02X,%s\r\n",
+  75:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].idx,
+  76:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].rssi,
+  77:BLEClient.c   **** //                    PUBLIC_OR_RANDOM(DeviceInfo[DeviceCount-1].DeviceList.type),
+  78:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[5],
+  79:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[4],
+  80:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[3],
+  81:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[2],
+  82:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[1],
+  83:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[0],
+  84:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceName
+  85:BLEClient.c   **** //                    
+  86:BLEClient.c   **** //                  );
+  87:BLEClient.c   ****             if(0==strncmp((char*)DeviceInfo[DeviceCount-1].DeviceName,"BLEBLE-105",10))//找到这�
+  88:BLEClient.c   ****             {
+  89:BLEClient.c   ****                 CyBle_GapcStopScan();   
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 3
+
+
+  90:BLEClient.c   **** //                CyDelay(2000);
+  91:BLEClient.c   ****                 STOP_SCAN_FLAG=TRUE;
+  92:BLEClient.c   **** //                printf("%d\r\n",CyBle_GetState());                             
+  93:BLEClient.c   ****             }
+  94:BLEClient.c   ****             while((UART_SpiUartGetTxBufferSize() + UART_GET_TX_FIFO_SR_VALID) != 0);//等待串口�
+  95:BLEClient.c   ****             return;
+  96:BLEClient.c   ****         }
+  97:BLEClient.c   ****         
+  98:BLEClient.c   ****         
+  99:BLEClient.c   ****     }
+ 100:BLEClient.c   **** //    循环比较扫描到的地址是不是之前扫描过的,如果有之前扫描过的地址�
+ 101:BLEClient.c   ****     for(i=0;i<DeviceCount;i++)
+ 102:BLEClient.c   ****     {        
+ 103:BLEClient.c   ****         if(memcmp(ScanReport->peerBdAddr,DeviceInfo[i].DeviceList.bdAddr,6)==0)
+ 104:BLEClient.c   ****         {
+ 105:BLEClient.c   **** //            NewAddr=0;
+ 106:BLEClient.c   ****             return;
+ 107:BLEClient.c   ****         }
+ 108:BLEClient.c   ****     }
+ 109:BLEClient.c   ****     DeviceCount++;
+ 110:BLEClient.c   ****     memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+ 111:BLEClient.c   ****     if(CYBLE_GAP_ADDR_TYPE_PUBLIC==ScanReport->peerAddrType)
+ 112:BLEClient.c   ****     {
+ 113:BLEClient.c   ****         DeviceInfo[DeviceCount-1].DeviceList.type=CYBLE_GAP_ADDR_TYPE_PUBLIC;
+ 114:BLEClient.c   **** //        DeviceInfo[DeviceCount-1].DeviceList.type='P';
+ 115:BLEClient.c   ****     }
+ 116:BLEClient.c   ****     else
+ 117:BLEClient.c   ****     {
+ 118:BLEClient.c   ****         DeviceInfo[DeviceCount-1].DeviceList.type=CYBLE_GAP_ADDR_TYPE_RANDOM;
+ 119:BLEClient.c   **** //        DeviceInfo[DeviceCount-1].DeviceList.type='R';
+ 120:BLEClient.c   ****     }
+ 121:BLEClient.c   ****     DeviceInfo[DeviceCount-1].idx=DeviceCount;        
+ 122:BLEClient.c   ****     if(CYBLE_GAPC_CONN_UNDIRECTED_ADV==ScanReport->eventType)   
+ 123:BLEClient.c   ****     {
+ 124:BLEClient.c   ****         DeviceInfo[DeviceCount-1].rssi=ScanReport->rssi;
+ 125:BLEClient.c   ****         Parser_adv_data_scan_data(ScanReport->data,ScanReport->dataLen);
+ 126:BLEClient.c   ****         if(DeviceInfo[DeviceCount-1].ScanName)
+ 127:BLEClient.c   ****             {
+ 128:BLEClient.c   ****                 DeviceInfo[DeviceCount-1].ScanName=FALSE;
+ 129:BLEClient.c   ****             }
+ 130:BLEClient.c   ****             else
+ 131:BLEClient.c   ****             {
+ 132:BLEClient.c   ****                 memset(DeviceInfo[DeviceCount-1].DeviceName,0,sizeof(DeviceInfo[DeviceCount-1].Devi
+ 133:BLEClient.c   ****                 memcpy(DeviceInfo[DeviceCount-1].DeviceName,"NULL",sizeof("NULL"));
+ 134:BLEClient.c   ****             }
+ 135:BLEClient.c   **** //            printf("+SCAN=%d,%d,%c,%02X%02X%02X%02X%02X%02X,%s\r\n",
+ 136:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].idx,
+ 137:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].rssi,
+ 138:BLEClient.c   **** //                    PUBLIC_OR_RANDOM(DeviceInfo[DeviceCount-1].DeviceList.type),
+ 139:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[5],
+ 140:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[4],
+ 141:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[3],
+ 142:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[2],
+ 143:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[1],
+ 144:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceList.bdAddr[0],
+ 145:BLEClient.c   **** //                    DeviceInfo[DeviceCount-1].DeviceName
+ 146:BLEClient.c   **** //                    
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 4
+
+
+ 147:BLEClient.c   **** //                  );
+ 148:BLEClient.c   ****             if(0==strncmp((char*)DeviceInfo[DeviceCount-1].DeviceName,"BLEBLE-105",10))//找到这�
+ 149:BLEClient.c   ****             {
+ 150:BLEClient.c   ****                 CyBle_GapcStopScan();
+ 151:BLEClient.c   **** //                CyDelay(2000);
+ 152:BLEClient.c   ****                 STOP_SCAN_FLAG=TRUE;
+ 153:BLEClient.c   **** //                 printf("%d\r\n",CyBle_GetState());                
+ 154:BLEClient.c   **** //                CyDelayUs(500);
+ 155:BLEClient.c   **** //                printf("%d",CyBle_GetState());
+ 156:BLEClient.c   ****                 
+ 157:BLEClient.c   ****             }
+ 158:BLEClient.c   ****             while((UART_SpiUartGetTxBufferSize() + UART_GET_TX_FIFO_SR_VALID) != 0);//等待串口�
+ 159:BLEClient.c   ****     }
+ 160:BLEClient.c   ****     
+ 161:BLEClient.c   **** }
+ 162:BLEClient.c   **** 
+ 163:BLEClient.c   **** /******************************************************************************
+ 164:BLEClient.c   **** * Function Name: Parser_adv_data_scan_data
+ 165:BLEClient.c   **** ***************************************************************************//**
+ 166:BLEClient.c   **** * 
+ 167:BLEClient.c   **** *  解析空中广播数据或者扫描响应数据
+ 168:BLEClient.c   **** * \param  pdata:指向空中广播数据或者扫描响应数据的指针
+ 169:BLEClient.c   **** * \param  total_len:空中广播数据或者扫描响应数据的长度
+ 170:BLEClient.c   **** * \return
+ 171:BLEClient.c   **** *  None
+ 172:BLEClient.c   **** * 
+ 173:BLEClient.c   **** ******************************************************************************/
+ 174:BLEClient.c   **** void Parser_adv_data_scan_data(uint8_t *pdata, uint8_t total_len)
+ 175:BLEClient.c   **** {
+  26              		.loc 1 175 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  29 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+  30              		.cfi_def_cfa_offset 32
+  31              		.cfi_offset 0, -32
+  32              		.cfi_offset 1, -28
+  33              		.cfi_offset 2, -24
+  34              		.cfi_offset 4, -20
+  35              		.cfi_offset 5, -16
+  36              		.cfi_offset 6, -12
+  37              		.cfi_offset 7, -8
+  38              		.cfi_offset 14, -4
+ 176:BLEClient.c   ****     uint8_t* pend=pdata+total_len;
+  39              		.loc 1 176 0
+  40 0002 4318     		add	r3, r0, r1
+  41 0004 0193     		str	r3, [sp, #4]
+  42              	.LVL1:
+ 177:BLEClient.c   ****     uint8_t length=0;
+  43              		.loc 1 177 0
+  44 0006 0023     		mov	r3, #0
+  45              	.LVL2:
+ 178:BLEClient.c   ****     uint8_t i,ServiceCount;
+ 179:BLEClient.c   ****     pdata++;
+  46              		.loc 1 179 0
+  47 0008 441C     		add	r4, r0, #1
+  48              	.LVL3:
+  49              	.L2:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 5
+
+
+ 180:BLEClient.c   ****     while(pend>pdata)
+  50              		.loc 1 180 0
+  51 000a 019A     		ldr	r2, [sp, #4]
+  52 000c A242     		cmp	r2, r4
+  53 000e 40D9     		bls	.L15
+ 181:BLEClient.c   ****     {
+ 182:BLEClient.c   **** //      pdata-1表示的是对应内容的长度，pdata+1表示的是对应的内容
+ 183:BLEClient.c   ****         switch(*pdata)
+  54              		.loc 1 183 0
+  55 0010 2078     		ldrb	r0, [r4]
+  56 0012 0138     		sub	r0, r0, #1
+  57 0014 0928     		cmp	r0, #9
+  58 0016 3AD8     		bhi	.L3
+  59 0018 FFF7FEFF 		bl	__gnu_thumb1_case_uqi
+  60              	.L5:
+  61 001c 35       		.byte	(.L10-.L5)/2
+  62 001d 35       		.byte	(.L10-.L5)/2
+  63 001e 35       		.byte	(.L10-.L5)/2
+  64 001f 39       		.byte	(.L3-.L5)/2
+  65 0020 39       		.byte	(.L3-.L5)/2
+  66 0021 39       		.byte	(.L3-.L5)/2
+  67 0022 39       		.byte	(.L3-.L5)/2
+  68 0023 05       		.byte	(.L8-.L5)/2
+  69 0024 1B       		.byte	(.L9-.L5)/2
+  70 0025 35       		.byte	(.L10-.L5)/2
+  71              		.p2align 1
+  72              	.L8:
+ 184:BLEClient.c   ****         {
+ 185:BLEClient.c   ****             case CYBLE_GAP_ADV_FLAGS:
+ 186:BLEClient.c   **** //                printf("Flags is %d\r\n",*(pdata+1));
+ 187:BLEClient.c   ****                 length=1+*(pdata-1);
+ 188:BLEClient.c   ****             break;
+ 189:BLEClient.c   ****             //比如有几个服务，那么就有几个服务的UUID，
+ 190:BLEClient.c   ****             //广播中只要没有把全部的服务UUID，就是CYBLE_GAP_ADV_INCOMPL_16UUID
+ 191:BLEClient.c   ****             case CYBLE_GAP_ADV_INCOMPL_16UUID:
+ 192:BLEClient.c   **** //          服务ID的数量
+ 193:BLEClient.c   ****                 ServiceCount=(*(pdata-1)-1)/2;
+ 194:BLEClient.c   ****                 for(i=0;i<ServiceCount;i++)
+ 195:BLEClient.c   ****                 {                
+ 196:BLEClient.c   ****                     switch(i)
+ 197:BLEClient.c   ****                     {
+ 198:BLEClient.c   ****                         case 0:
+ 199:BLEClient.c   **** //                            printf("Service1 ID is: 0x%02X%02X\r\n",*(pdata+i+2),*(pdata+i+1));
+ 200:BLEClient.c   ****                         break;                       
+ 201:BLEClient.c   ****                         case 1:
+ 202:BLEClient.c   **** //                            printf("Service2 ID is: 0x%02X%02X\r\n",*(pdata+i+3),*(pdata+i+2));
+ 203:BLEClient.c   ****                         break;                    
+ 204:BLEClient.c   ****                         case 2:
+ 205:BLEClient.c   **** //                            printf("Service3 ID is: 0x%02X%02X\r\n",*(pdata+i+4),*(pdata+i+3));
+ 206:BLEClient.c   ****                         break;
+ 207:BLEClient.c   ****                         case 3:
+ 208:BLEClient.c   **** //                            printf("Service4 ID is: 0x%02X%02X\r\n",*(pdata+i+5),*(pdata+i+4));
+ 209:BLEClient.c   ****                         break;
+ 210:BLEClient.c   ****                         case 4:
+ 211:BLEClient.c   **** //                            printf("Service5 ID is: 0x%02X%02X\r\n",*(pdata+i+6),*(pdata+i+5));
+ 212:BLEClient.c   ****                         break;
+ 213:BLEClient.c   ****                         case 5:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 6
+
+
+ 214:BLEClient.c   **** //                            printf("Service6 ID is: 0x%02X%02X\r\n",*(pdata+i+7),*(pdata+i+6));
+ 215:BLEClient.c   ****                         break;
+ 216:BLEClient.c   ****                         case 6:
+ 217:BLEClient.c   **** //                            printf("Service7 ID is: 0x%02X%02X\r\n",*(pdata+i+8),*(pdata+i+7));
+ 218:BLEClient.c   ****                         break;
+ 219:BLEClient.c   ****                         case 7:
+ 220:BLEClient.c   **** //                            printf("Service8 ID is: 0x%02X%02X\r\n",*(pdata+i+9),*(pdata+i+8));
+ 221:BLEClient.c   ****                         break;
+ 222:BLEClient.c   ****                         case 8:
+ 223:BLEClient.c   **** //                            printf("Service9 ID is: 0x%02X%02X\r\n",*(pdata+i+10),*(pdata+i+9));
+ 224:BLEClient.c   ****                         break;
+ 225:BLEClient.c   ****                         case 9:
+ 226:BLEClient.c   **** //                            printf("Service10 ID is: 0x%02X%02X\r\n",*(pdata+i+11),*(pdata+i+10))
+ 227:BLEClient.c   ****                         break;
+ 228:BLEClient.c   ****                         default:
+ 229:BLEClient.c   ****                         break;
+ 230:BLEClient.c   ****                     }
+ 231:BLEClient.c   ****                 }
+ 232:BLEClient.c   ****                 length=1+*(pdata-1);
+ 233:BLEClient.c   ****             break;
+ 234:BLEClient.c   ****             case CYBLE_GAP_ADV_COMPL_16UUID:
+ 235:BLEClient.c   ****                 ServiceCount=(*(pdata-1)-1)/2;
+ 236:BLEClient.c   ****                 for(i=0;i<ServiceCount;i++)
+ 237:BLEClient.c   ****                 {                
+ 238:BLEClient.c   ****                     switch(i)
+ 239:BLEClient.c   ****                     {
+ 240:BLEClient.c   ****                         case 0:
+ 241:BLEClient.c   **** //                            printf("Service1 ID is: 0x%02X%02X\r\n",*(pdata+i+2),*(pdata+i+1));
+ 242:BLEClient.c   ****                         break;                       
+ 243:BLEClient.c   ****                         case 1:
+ 244:BLEClient.c   **** //                            printf("Service2 ID is: 0x%02X%02X\r\n",*(pdata+i+3),*(pdata+i+2));
+ 245:BLEClient.c   ****                         break;                    
+ 246:BLEClient.c   ****                         case 2:
+ 247:BLEClient.c   **** //                            printf("Service3 ID is: 0x%02X%02X\r\n",*(pdata+i+4),*(pdata+i+3));
+ 248:BLEClient.c   ****                         break;
+ 249:BLEClient.c   ****                         case 3:
+ 250:BLEClient.c   **** //                            printf("Service4 ID is: 0x%02X%02X\r\n",*(pdata+i+5),*(pdata+i+4));
+ 251:BLEClient.c   ****                         break;
+ 252:BLEClient.c   ****                         case 4:
+ 253:BLEClient.c   **** //                            printf("Service5 ID is: 0x%02X%02X\r\n",*(pdata+i+6),*(pdata+i+5));
+ 254:BLEClient.c   ****                         break;
+ 255:BLEClient.c   ****                         case 5:
+ 256:BLEClient.c   **** //                            printf("Service6 ID is: 0x%02X%02X\r\n",*(pdata+i+7),*(pdata+i+6));
+ 257:BLEClient.c   ****                         break;
+ 258:BLEClient.c   ****                         case 6:
+ 259:BLEClient.c   **** //                            printf("Service7 ID is: 0x%02X%02X\r\n",*(pdata+i+8),*(pdata+i+7));
+ 260:BLEClient.c   ****                         break;
+ 261:BLEClient.c   ****                         case 7:
+ 262:BLEClient.c   **** //                            printf("Service8 ID is: 0x%02X%02X\r\n",*(pdata+i+9),*(pdata+i+8));
+ 263:BLEClient.c   ****                         break;
+ 264:BLEClient.c   ****                         case 8:
+ 265:BLEClient.c   **** //                            printf("Service9 ID is: 0x%02X%02X\r\n",*(pdata+i+10),*(pdata+i+9));
+ 266:BLEClient.c   ****                         break;
+ 267:BLEClient.c   ****                         case 9:
+ 268:BLEClient.c   **** //                            printf("Service10 ID is: 0x%02X%02X\r\n",*(pdata+i+11),*(pdata+i+10))
+ 269:BLEClient.c   ****                         break;
+ 270:BLEClient.c   ****                         default:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 7
+
+
+ 271:BLEClient.c   ****                         break;
+ 272:BLEClient.c   ****                     }
+ 273:BLEClient.c   ****                 }
+ 274:BLEClient.c   ****                 length=1+*(pdata-1);
+ 275:BLEClient.c   ****             break;           
+ 276:BLEClient.c   ****             case CYBLE_GAP_ADV_INCOMPL_32_UUID:
+ 277:BLEClient.c   ****                 
+ 278:BLEClient.c   ****             break;
+ 279:BLEClient.c   ****             case CYBLE_GAP_ADV_COMPL_32_UUID:
+ 280:BLEClient.c   ****             
+ 281:BLEClient.c   ****             break;
+ 282:BLEClient.c   ****             case CYBLE_GAP_ADV_INCOMPL_128_UUID:
+ 283:BLEClient.c   ****             
+ 284:BLEClient.c   ****             break;
+ 285:BLEClient.c   ****             case CYBLE_GAP_ADV_COMPL_128_UUID:
+ 286:BLEClient.c   ****             
+ 287:BLEClient.c   ****             break;  
+ 288:BLEClient.c   ****             case CYBLE_GAP_ADV_SHORT_NAME:
+ 289:BLEClient.c   ****                 //提前初始化DeviceName指针的前面20个Byte
+ 290:BLEClient.c   ****                 memset(DeviceInfo[DeviceCount-1].DeviceName,0,sizeof(DeviceInfo[DeviceCount-1].Devi
+  73              		.loc 1 290 0
+  74 0026 1B4B     		ldr	r3, .L16
+  75              	.LVL4:
+  76 0028 0021     		mov	r1, #0
+  77 002a 1D78     		ldrb	r5, [r3]
+  78 002c 1E23     		mov	r3, #30
+  79 002e 013D     		sub	r5, r5, #1
+  80 0030 5D43     		mul	r5, r3
+  81 0032 194B     		ldr	r3, .L16+4
+  82 0034 1422     		mov	r2, #20
+  83 0036 5D19     		add	r5, r3, r5
+  84 0038 0935     		add	r5, r5, #9
+ 291:BLEClient.c   **** //                memcpy(DeviceName,(pdata+1),*(pdata-1)-1);
+ 292:BLEClient.c   **** //                printf("Shortened Local Name is: %s\r\n",DeviceName);
+ 293:BLEClient.c   **** //                printf("%s>\r\n",DeviceName);
+ 294:BLEClient.c   ****                 memcpy(DeviceInfo[DeviceCount-1].DeviceName,(pdata+1),*(pdata-1)-1);
+  85              		.loc 1 294 0
+  86 003a 661E     		sub	r6, r4, #1
+ 290:BLEClient.c   **** //                memcpy(DeviceName,(pdata+1),*(pdata-1)-1);
+  87              		.loc 1 290 0
+  88 003c 281C     		mov	r0, r5
+  89 003e FFF7FEFF 		bl	memset
+  90              	.LVL5:
+  91              		.loc 1 294 0
+  92 0042 3278     		ldrb	r2, [r6]
+  93 0044 611C     		add	r1, r4, #1
+  94 0046 013A     		sub	r2, r2, #1
+  95 0048 281C     		mov	r0, r5
+  96 004a FFF7FEFF 		bl	memcpy
+  97              	.LVL6:
+ 295:BLEClient.c   ****                 length=1+*(pdata-1);
+  98              		.loc 1 295 0
+  99 004e 3378     		ldrb	r3, [r6]
+ 100 0050 1BE0     		b	.L13
+ 101              	.LVL7:
+ 102              	.L9:
+ 296:BLEClient.c   ****             break;
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 8
+
+
+ 297:BLEClient.c   ****             case CYBLE_GAP_ADV_COMPL_NAME:
+ 298:BLEClient.c   ****                 //提前初始化DeviceName指针的前面20个Byte
+ 299:BLEClient.c   ****                 memset(DeviceInfo[DeviceCount-1].DeviceName,0,sizeof(DeviceInfo[DeviceCount-1].Devi
+ 103              		.loc 1 299 0
+ 104 0052 104B     		ldr	r3, .L16
+ 105              	.LVL8:
+ 106 0054 104F     		ldr	r7, .L16+4
+ 107 0056 1D78     		ldrb	r5, [r3]
+ 108 0058 1E23     		mov	r3, #30
+ 109 005a 013D     		sub	r5, r5, #1
+ 110 005c 5D43     		mul	r5, r3
+ 111 005e 7E19     		add	r6, r7, r5
+ 112 0060 0936     		add	r6, r6, #9
+ 113 0062 0021     		mov	r1, #0
+ 114 0064 1422     		mov	r2, #20
+ 115 0066 301C     		mov	r0, r6
+ 116 0068 FFF7FEFF 		bl	memset
+ 117              	.LVL9:
+ 300:BLEClient.c   **** //                memcpy(DeviceName,(pdata+1),*(pdata-1)-1);
+ 301:BLEClient.c   ****                 memcpy(DeviceInfo[DeviceCount-1].DeviceName,(pdata+1),*(pdata-1)-1);
+ 118              		.loc 1 301 0
+ 119 006c 631E     		sub	r3, r4, #1
+ 120 006e 1A78     		ldrb	r2, [r3]
+ 121 0070 611C     		add	r1, r4, #1
+ 122 0072 013A     		sub	r2, r2, #1
+ 123 0074 301C     		mov	r0, r6
+ 124 0076 0093     		str	r3, [sp]
+ 125 0078 FFF7FEFF 		bl	memcpy
+ 126              	.LVL10:
+ 302:BLEClient.c   ****                 DeviceInfo[DeviceCount-1].ScanName=TRUE;
+ 127              		.loc 1 302 0
+ 128 007c 0123     		mov	r3, #1
+ 129 007e 7D19     		add	r5, r7, r5
+ 130 0080 6B77     		strb	r3, [r5, #29]
+ 303:BLEClient.c   **** //                printf("Complete Local Name is: %s\r\n",DeviceInfo[DeviceCount-1].DeviceName);   
+ 304:BLEClient.c   **** //                printf("%s>\r\n",DeviceName);
+ 305:BLEClient.c   ****                 length=1+*(pdata-1);
+ 131              		.loc 1 305 0
+ 132 0082 009B     		ldr	r3, [sp]
+ 133 0084 00E0     		b	.L12
+ 134              	.LVL11:
+ 135              	.L10:
+ 306:BLEClient.c   ****             break;
+ 307:BLEClient.c   ****             case CYBLE_GAP_ADV_TX_PWR_LVL:
+ 308:BLEClient.c   **** //                printf("Tx Power Level is: %ddbm\r\n",*(pdata+1));
+ 309:BLEClient.c   ****                 length=1+*(pdata-1);
+ 136              		.loc 1 309 0
+ 137 0086 631E     		sub	r3, r4, #1
+ 138              	.LVL12:
+ 139              	.L12:
+ 140 0088 1B78     		ldrb	r3, [r3]
+ 141              	.L13:
+ 142 008a 0133     		add	r3, r3, #1
+ 143 008c DBB2     		uxtb	r3, r3
+ 144              	.LVL13:
+ 145              	.L3:
+ 310:BLEClient.c   ****             break;
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 9
+
+
+ 311:BLEClient.c   ****             case CYBLE_GAP_ADV_CLASS_OF_DEVICE:
+ 312:BLEClient.c   ****                 
+ 313:BLEClient.c   ****             break;
+ 314:BLEClient.c   ****             
+ 315:BLEClient.c   ****             case CYBLE_GAP_ADV_SMPL_PAIR_HASH_C:
+ 316:BLEClient.c   ****                 
+ 317:BLEClient.c   ****             break;
+ 318:BLEClient.c   ****             case CYBLE_GAP_ADV_SMPL_PAIR_RANDOM_R:
+ 319:BLEClient.c   ****                 
+ 320:BLEClient.c   ****             break;     
+ 321:BLEClient.c   ****             //CYBLE_GAP_ADV_SCRT_MNGR_TK_VAL的枚举值
+ 322:BLEClient.c   ****             //跟CYBLE_GAP_ADV_DEVICE_ID相同    
+ 323:BLEClient.c   ****             case CYBLE_GAP_ADV_DEVICE_ID:
+ 324:BLEClient.c   ****                 
+ 325:BLEClient.c   ****             break;
+ 326:BLEClient.c   ****             case CYBLE_GAP_ADV_SCRT_MNGR_OOB_FLAGS:
+ 327:BLEClient.c   ****                 
+ 328:BLEClient.c   ****             break;   
+ 329:BLEClient.c   ****             case CYBLE_GAP_ADV_SLAVE_CONN_INTRV_RANGE:
+ 330:BLEClient.c   ****                 
+ 331:BLEClient.c   ****             break;    
+ 332:BLEClient.c   ****             case CYBLE_GAP_ADV_SOLICIT_16UUID:
+ 333:BLEClient.c   ****                 
+ 334:BLEClient.c   ****             break;     
+ 335:BLEClient.c   ****             case CYBLE_GAP_ADV_SOLICIT_128UUID:
+ 336:BLEClient.c   ****                 
+ 337:BLEClient.c   ****             break; 
+ 338:BLEClient.c   ****             case CYBLE_GAP_ADV_SRVC_DATA_16UUID:
+ 339:BLEClient.c   ****                 
+ 340:BLEClient.c   ****             break;    
+ 341:BLEClient.c   ****             case CYBLE_GAP_ADV_PUBLIC_TARGET_ADDR:
+ 342:BLEClient.c   ****                 
+ 343:BLEClient.c   ****             break;  
+ 344:BLEClient.c   ****             case CYBLE_GAP_ADV_RANDOM_TARGET_ADDR:
+ 345:BLEClient.c   ****                 
+ 346:BLEClient.c   ****             break;    
+ 347:BLEClient.c   ****             case CYBLE_GAP_ADV_APPEARANCE:
+ 348:BLEClient.c   ****                 
+ 349:BLEClient.c   ****             break;     
+ 350:BLEClient.c   ****             case CYBLE_GAP_ADV_ADVERT_INTERVAL:
+ 351:BLEClient.c   ****                 
+ 352:BLEClient.c   ****             break;   
+ 353:BLEClient.c   ****             case CYBLE_GAP_ADV_LE_BT_DEVICE_ADDR:
+ 354:BLEClient.c   ****                 
+ 355:BLEClient.c   ****             break;
+ 356:BLEClient.c   ****             case CYBLE_GAP_ADV_LE_ROLE:
+ 357:BLEClient.c   ****                 
+ 358:BLEClient.c   ****             break;
+ 359:BLEClient.c   ****             case CYBLE_GAP_ADV_SMPL_PAIR_HASH_C256:
+ 360:BLEClient.c   ****                 
+ 361:BLEClient.c   ****             break;
+ 362:BLEClient.c   ****             case CYBLE_GAP_ADV_SMPL_PAIR_RANDOM_R256:
+ 363:BLEClient.c   ****                 
+ 364:BLEClient.c   ****             break;
+ 365:BLEClient.c   ****             case CYBLE_GAP_ADV_SOLICIT_32UUID:
+ 366:BLEClient.c   ****                 
+ 367:BLEClient.c   ****             break;  
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 10
+
+
+ 368:BLEClient.c   ****             case CYBLE_GAP_ADV_SRVC_DATA_32UUID:
+ 369:BLEClient.c   ****                 
+ 370:BLEClient.c   ****             break;
+ 371:BLEClient.c   ****             case CYBLE_GAP_ADV_SRVC_DATA_128UUID:
+ 372:BLEClient.c   ****                 
+ 373:BLEClient.c   ****             break;
+ 374:BLEClient.c   ****             case CYBLE_GAP_ADV_3D_INFO_DATA:
+ 375:BLEClient.c   ****                 
+ 376:BLEClient.c   ****             break;
+ 377:BLEClient.c   ****             default:                
+ 378:BLEClient.c   ****             break;
+ 379:BLEClient.c   ****                 
+ 380:BLEClient.c   ****         }
+ 381:BLEClient.c   ****         pdata+=length;
+ 146              		.loc 1 381 0
+ 147 008e E418     		add	r4, r4, r3
+ 148              	.LVL14:
+ 149 0090 BBE7     		b	.L2
+ 150              	.L15:
+ 382:BLEClient.c   ****     }    
+ 383:BLEClient.c   **** //    printf("<%d,",DeviceCount);
+ 384:BLEClient.c   **** }
+ 151              		.loc 1 384 0
+ 152              		@ sp needed
+ 153              	.LVL15:
+ 154 0092 F7BD     		pop	{r0, r1, r2, r4, r5, r6, r7, pc}
+ 155              	.L17:
+ 156              		.align	2
+ 157              	.L16:
+ 158 0094 00000000 		.word	.LANCHOR0
+ 159 0098 00000000 		.word	DeviceInfo
+ 160              		.cfi_endproc
+ 161              	.LFE38:
+ 162              		.size	Parser_adv_data_scan_data, .-Parser_adv_data_scan_data
+ 163              		.section	.text.HandleScanDevices,"ax",%progbits
+ 164              		.align	1
+ 165              		.global	HandleScanDevices
+ 166              		.code	16
+ 167              		.thumb_func
+ 168              		.type	HandleScanDevices, %function
+ 169              	HandleScanDevices:
+ 170              	.LFB37:
+  38:BLEClient.c   **** //    printf("Advertising or Scan Response Data is 0x%02X%02X%02X%02X%02X%02X\r\n",
+ 171              		.loc 1 38 0
+ 172              		.cfi_startproc
+ 173              	.LVL16:
+ 174 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+ 175              		.cfi_def_cfa_offset 32
+ 176              		.cfi_offset 0, -32
+ 177              		.cfi_offset 1, -28
+ 178              		.cfi_offset 2, -24
+ 179              		.cfi_offset 4, -20
+ 180              		.cfi_offset 5, -16
+ 181              		.cfi_offset 6, -12
+ 182              		.cfi_offset 7, -8
+ 183              		.cfi_offset 14, -4
+  44:BLEClient.c   ****     {           
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 11
+
+
+ 184              		.loc 1 44 0
+ 185 0002 644B     		ldr	r3, .L44
+  38:BLEClient.c   **** //    printf("Advertising or Scan Response Data is 0x%02X%02X%02X%02X%02X%02X\r\n",
+ 186              		.loc 1 38 0
+ 187 0004 041C     		mov	r4, r0
+  44:BLEClient.c   ****     {           
+ 188              		.loc 1 44 0
+ 189 0006 5A78     		ldrb	r2, [r3, #1]
+ 190 0008 0093     		str	r3, [sp]
+ 191 000a 012A     		cmp	r2, #1
+ 192 000c 5BD0     		beq	.L19
+  46:BLEClient.c   ****         if(CYBLE_GAPC_CONN_UNDIRECTED_ADV==ScanReport->eventType)   
+ 193              		.loc 1 46 0
+ 194 000e 0123     		mov	r3, #1
+ 195 0010 009A     		ldr	r2, [sp]
+ 196 0012 5370     		strb	r3, [r2, #1]
+  47:BLEClient.c   ****         {
+ 197              		.loc 1 47 0
+ 198 0014 0378     		ldrb	r3, [r0]
+ 199 0016 002B     		cmp	r3, #0
+ 200 0018 55D1     		bne	.L19
+  49:BLEClient.c   ****             memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+ 201              		.loc 1 49 0
+ 202 001a 1778     		ldrb	r7, [r2]
+  50:BLEClient.c   ****             if(CYBLE_GAP_ADDR_TYPE_PUBLIC==ScanReport->peerAddrType)
+ 203              		.loc 1 50 0
+ 204 001c 1E25     		mov	r5, #30
+  49:BLEClient.c   ****             memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+ 205              		.loc 1 49 0
+ 206 001e 0137     		add	r7, r7, #1
+ 207 0020 FFB2     		uxtb	r7, r7
+  50:BLEClient.c   ****             if(CYBLE_GAP_ADDR_TYPE_PUBLIC==ScanReport->peerAddrType)
+ 208              		.loc 1 50 0
+ 209 0022 7B1E     		sub	r3, r7, #1
+ 210 0024 1E1C     		mov	r6, r3
+ 211 0026 6E43     		mul	r6, r5
+ 212 0028 0193     		str	r3, [sp, #4]
+ 213 002a 5B4B     		ldr	r3, .L44+4
+  49:BLEClient.c   ****             memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+ 214              		.loc 1 49 0
+ 215 002c 1770     		strb	r7, [r2]
+  50:BLEClient.c   ****             if(CYBLE_GAP_ADDR_TYPE_PUBLIC==ScanReport->peerAddrType)
+ 216              		.loc 1 50 0
+ 217 002e 9E19     		add	r6, r3, r6
+ 218 0030 301C     		mov	r0, r6
+ 219              	.LVL17:
+ 220 0032 6168     		ldr	r1, [r4, #4]
+ 221 0034 0622     		mov	r2, #6
+ 222 0036 FFF7FEFF 		bl	memcpy
+ 223              	.LVL18:
+  51:BLEClient.c   ****             {
+ 224              		.loc 1 51 0
+ 225 003a 6378     		ldrb	r3, [r4, #1]
+ 226 003c 002B     		cmp	r3, #0
+ 227 003e 00D0     		beq	.L41
+  58:BLEClient.c   **** //                DeviceInfo[DeviceCount-1].DeviceList.type='R';
+ 228              		.loc 1 58 0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 12
+
+
+ 229 0040 0123     		mov	r3, #1
+ 230              	.L41:
+  61:BLEClient.c   ****             DeviceInfo[DeviceCount-1].rssi=ScanReport->rssi;
+ 231              		.loc 1 61 0
+ 232 0042 0198     		ldr	r0, [sp, #4]
+  58:BLEClient.c   **** //                DeviceInfo[DeviceCount-1].DeviceList.type='R';
+ 233              		.loc 1 58 0
+ 234 0044 B371     		strb	r3, [r6, #6]
+  61:BLEClient.c   ****             DeviceInfo[DeviceCount-1].rssi=ScanReport->rssi;
+ 235              		.loc 1 61 0
+ 236 0046 6843     		mul	r0, r5
+ 237 0048 534B     		ldr	r3, .L44+4
+  63:BLEClient.c   ****             Parser_adv_data_scan_data(ScanReport->data,ScanReport->dataLen);
+ 238              		.loc 1 63 0
+ 239 004a 0622     		mov	r2, #6
+  61:BLEClient.c   ****             DeviceInfo[DeviceCount-1].rssi=ScanReport->rssi;
+ 240              		.loc 1 61 0
+ 241 004c 1818     		add	r0, r3, r0
+ 242 004e C771     		strb	r7, [r0, #7]
+  62:BLEClient.c   ****             memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+ 243              		.loc 1 62 0
+ 244 0050 237C     		ldrb	r3, [r4, #16]
+ 245 0052 0372     		strb	r3, [r0, #8]
+  63:BLEClient.c   ****             Parser_adv_data_scan_data(ScanReport->data,ScanReport->dataLen);
+ 246              		.loc 1 63 0
+ 247 0054 6168     		ldr	r1, [r4, #4]
+ 248 0056 FFF7FEFF 		bl	memcpy
+ 249              	.LVL19:
+  64:BLEClient.c   ****             if(DeviceInfo[DeviceCount-1].ScanName)
+ 250              		.loc 1 64 0
+ 251 005a 217A     		ldrb	r1, [r4, #8]
+ 252 005c E068     		ldr	r0, [r4, #12]
+ 253 005e FFF7FEFF 		bl	Parser_adv_data_scan_data
+ 254              	.LVL20:
+  65:BLEClient.c   ****             {
+ 255              		.loc 1 65 0
+ 256 0062 009B     		ldr	r3, [sp]
+ 257 0064 1C78     		ldrb	r4, [r3]
+ 258              	.LVL21:
+ 259 0066 4C4B     		ldr	r3, .L44+4
+ 260 0068 013C     		sub	r4, r4, #1
+ 261 006a 6543     		mul	r5, r4
+ 262 006c 5B19     		add	r3, r3, r5
+ 263 006e 597F     		ldrb	r1, [r3, #29]
+ 264 0070 1833     		add	r3, r3, #24
+ 265 0072 0029     		cmp	r1, #0
+ 266 0074 02D0     		beq	.L22
+  67:BLEClient.c   ****             }
+ 267              		.loc 1 67 0
+ 268 0076 0022     		mov	r2, #0
+ 269 0078 5A71     		strb	r2, [r3, #5]
+ 270 007a 0BE0     		b	.L23
+ 271              	.L22:
+  71:BLEClient.c   ****                 memcpy(DeviceInfo[DeviceCount-1].DeviceName,"NULL",sizeof("NULL"));
+ 272              		.loc 1 71 0
+ 273 007c 464B     		ldr	r3, .L44+4
+ 274 007e 1422     		mov	r2, #20
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 13
+
+
+ 275 0080 5D19     		add	r5, r3, r5
+ 276 0082 0935     		add	r5, r5, #9
+ 277 0084 281C     		mov	r0, r5
+ 278 0086 FFF7FEFF 		bl	memset
+ 279              	.LVL22:
+  72:BLEClient.c   ****             }
+ 280              		.loc 1 72 0
+ 281 008a 281C     		mov	r0, r5
+ 282 008c 4349     		ldr	r1, .L44+8
+ 283 008e 0522     		mov	r2, #5
+ 284 0090 FFF7FEFF 		bl	memcpy
+ 285              	.LVL23:
+ 286              	.L23:
+  87:BLEClient.c   ****             {
+ 287              		.loc 1 87 0
+ 288 0094 1E20     		mov	r0, #30
+ 289 0096 4443     		mul	r4, r0
+ 290 0098 3F4B     		ldr	r3, .L44+4
+ 291 009a 4149     		ldr	r1, .L44+12
+ 292 009c 1819     		add	r0, r3, r4
+ 293 009e 0930     		add	r0, r0, #9
+ 294 00a0 0A22     		mov	r2, #10
+ 295 00a2 FFF7FEFF 		bl	strncmp
+ 296              	.LVL24:
+ 297 00a6 0028     		cmp	r0, #0
+ 298 00a8 04D1     		bne	.L25
+  89:BLEClient.c   **** //                CyDelay(2000);
+ 299              		.loc 1 89 0
+ 300 00aa FFF7FEFF 		bl	CyBle_GapcStopScan
+ 301              	.LVL25:
+  91:BLEClient.c   **** //                printf("%d\r\n",CyBle_GetState());                             
+ 302              		.loc 1 91 0
+ 303 00ae 0122     		mov	r2, #1
+ 304 00b0 3C4B     		ldr	r3, .L44+16
+ 305 00b2 1A70     		strb	r2, [r3]
+ 306              	.L25:
+  94:BLEClient.c   ****             return;
+ 307              		.loc 1 94 0 discriminator 5
+ 308 00b4 FFF7FEFF 		bl	UART_SpiUartGetTxBufferSize
+ 309              	.LVL26:
+ 310 00b8 3B4B     		ldr	r3, .L44+20
+ 311 00ba 1B68     		ldr	r3, [r3]
+ 312 00bc 1B04     		lsl	r3, r3, #16
+ 313 00be DB17     		asr	r3, r3, #31
+ 314 00c0 8342     		cmp	r3, r0
+ 315 00c2 F7D1     		bne	.L25
+ 316 00c4 64E0     		b	.L18
+ 317              	.LVL27:
+ 318              	.L19:
+ 319 00c6 1E26     		mov	r6, #30
+ 101:BLEClient.c   ****     {        
+ 320              		.loc 1 101 0
+ 321 00c8 009B     		ldr	r3, [sp]
+ 322 00ca 334F     		ldr	r7, .L44+4
+ 323 00cc 1D78     		ldrb	r5, [r3]
+ 324 00ce 6E43     		mul	r6, r5
+ 325 00d0 F619     		add	r6, r6, r7
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 14
+
+
+ 326              	.LVL28:
+ 327              	.L26:
+ 101:BLEClient.c   ****     {        
+ 328              		.loc 1 101 0 is_stmt 0 discriminator 1
+ 329 00d2 B742     		cmp	r7, r6
+ 330 00d4 08D0     		beq	.L43
+ 103:BLEClient.c   ****         {
+ 331              		.loc 1 103 0 is_stmt 1
+ 332 00d6 391C     		mov	r1, r7
+ 333 00d8 6068     		ldr	r0, [r4, #4]
+ 334 00da 0622     		mov	r2, #6
+ 335 00dc FFF7FEFF 		bl	memcmp
+ 336              	.LVL29:
+ 337 00e0 1E37     		add	r7, r7, #30
+ 338 00e2 0028     		cmp	r0, #0
+ 339 00e4 F5D1     		bne	.L26
+ 340 00e6 53E0     		b	.L18
+ 341              	.L43:
+ 109:BLEClient.c   ****     memcpy(DeviceInfo[DeviceCount-1].DeviceList.bdAddr,ScanReport->peerBdAddr,6);
+ 342              		.loc 1 109 0
+ 343 00e8 009B     		ldr	r3, [sp]
+ 344 00ea 0135     		add	r5, r5, #1
+ 345 00ec EDB2     		uxtb	r5, r5
+ 346 00ee 1D70     		strb	r5, [r3]
+ 110:BLEClient.c   ****     if(CYBLE_GAP_ADDR_TYPE_PUBLIC==ScanReport->peerAddrType)
+ 347              		.loc 1 110 0
+ 348 00f0 6B1E     		sub	r3, r5, #1
+ 349 00f2 1E1C     		mov	r6, r3
+ 350 00f4 1E27     		mov	r7, #30
+ 351 00f6 7E43     		mul	r6, r7
+ 352 00f8 0193     		str	r3, [sp, #4]
+ 353 00fa 274B     		ldr	r3, .L44+4
+ 354 00fc 6168     		ldr	r1, [r4, #4]
+ 355 00fe 9E19     		add	r6, r3, r6
+ 356 0100 301C     		mov	r0, r6
+ 357 0102 0622     		mov	r2, #6
+ 358 0104 FFF7FEFF 		bl	memcpy
+ 359              	.LVL30:
+ 111:BLEClient.c   ****     {
+ 360              		.loc 1 111 0
+ 361 0108 6378     		ldrb	r3, [r4, #1]
+ 362 010a 002B     		cmp	r3, #0
+ 363 010c 00D0     		beq	.L42
+ 118:BLEClient.c   **** //        DeviceInfo[DeviceCount-1].DeviceList.type='R';
+ 364              		.loc 1 118 0
+ 365 010e 0123     		mov	r3, #1
+ 366              	.L42:
+ 367 0110 B371     		strb	r3, [r6, #6]
+ 121:BLEClient.c   ****     if(CYBLE_GAPC_CONN_UNDIRECTED_ADV==ScanReport->eventType)   
+ 368              		.loc 1 121 0
+ 369 0112 019B     		ldr	r3, [sp, #4]
+ 370 0114 5F43     		mul	r7, r3
+ 371 0116 204B     		ldr	r3, .L44+4
+ 372 0118 DF19     		add	r7, r3, r7
+ 373 011a FD71     		strb	r5, [r7, #7]
+ 122:BLEClient.c   ****     {
+ 374              		.loc 1 122 0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 15
+
+
+ 375 011c 2578     		ldrb	r5, [r4]
+ 376 011e 002D     		cmp	r5, #0
+ 377 0120 36D1     		bne	.L18
+ 124:BLEClient.c   ****         Parser_adv_data_scan_data(ScanReport->data,ScanReport->dataLen);
+ 378              		.loc 1 124 0
+ 379 0122 237C     		ldrb	r3, [r4, #16]
+ 380 0124 3B72     		strb	r3, [r7, #8]
+ 125:BLEClient.c   ****         if(DeviceInfo[DeviceCount-1].ScanName)
+ 381              		.loc 1 125 0
+ 382 0126 217A     		ldrb	r1, [r4, #8]
+ 383 0128 E068     		ldr	r0, [r4, #12]
+ 126:BLEClient.c   ****             {
+ 384              		.loc 1 126 0
+ 385 012a 1E24     		mov	r4, #30
+ 386              	.LVL31:
+ 125:BLEClient.c   ****         if(DeviceInfo[DeviceCount-1].ScanName)
+ 387              		.loc 1 125 0
+ 388 012c FFF7FEFF 		bl	Parser_adv_data_scan_data
+ 389              	.LVL32:
+ 126:BLEClient.c   ****             {
+ 390              		.loc 1 126 0
+ 391 0130 009B     		ldr	r3, [sp]
+ 392 0132 1E78     		ldrb	r6, [r3]
+ 393 0134 184B     		ldr	r3, .L44+4
+ 394 0136 013E     		sub	r6, r6, #1
+ 395 0138 7443     		mul	r4, r6
+ 396 013a 1B19     		add	r3, r3, r4
+ 397 013c 597F     		ldrb	r1, [r3, #29]
+ 398 013e 1833     		add	r3, r3, #24
+ 399 0140 0029     		cmp	r1, #0
+ 400 0142 01D0     		beq	.L31
+ 128:BLEClient.c   ****             }
+ 401              		.loc 1 128 0
+ 402 0144 5D71     		strb	r5, [r3, #5]
+ 403 0146 0BE0     		b	.L32
+ 404              	.L31:
+ 132:BLEClient.c   ****                 memcpy(DeviceInfo[DeviceCount-1].DeviceName,"NULL",sizeof("NULL"));
+ 405              		.loc 1 132 0
+ 406 0148 134B     		ldr	r3, .L44+4
+ 407 014a 1422     		mov	r2, #20
+ 408 014c 1C19     		add	r4, r3, r4
+ 409 014e 0934     		add	r4, r4, #9
+ 410 0150 201C     		mov	r0, r4
+ 411 0152 FFF7FEFF 		bl	memset
+ 412              	.LVL33:
+ 133:BLEClient.c   ****             }
+ 413              		.loc 1 133 0
+ 414 0156 201C     		mov	r0, r4
+ 415 0158 1049     		ldr	r1, .L44+8
+ 416 015a 0522     		mov	r2, #5
+ 417 015c FFF7FEFF 		bl	memcpy
+ 418              	.LVL34:
+ 419              	.L32:
+ 148:BLEClient.c   ****             {
+ 420              		.loc 1 148 0
+ 421 0160 1E20     		mov	r0, #30
+ 422 0162 4643     		mul	r6, r0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 16
+
+
+ 423 0164 0C4B     		ldr	r3, .L44+4
+ 424 0166 0E49     		ldr	r1, .L44+12
+ 425 0168 9819     		add	r0, r3, r6
+ 426 016a 0930     		add	r0, r0, #9
+ 427 016c 0A22     		mov	r2, #10
+ 428 016e FFF7FEFF 		bl	strncmp
+ 429              	.LVL35:
+ 430 0172 0028     		cmp	r0, #0
+ 431 0174 04D1     		bne	.L34
+ 150:BLEClient.c   **** //                CyDelay(2000);
+ 432              		.loc 1 150 0
+ 433 0176 FFF7FEFF 		bl	CyBle_GapcStopScan
+ 434              	.LVL36:
+ 152:BLEClient.c   **** //                 printf("%d\r\n",CyBle_GetState());                
+ 435              		.loc 1 152 0
+ 436 017a 0122     		mov	r2, #1
+ 437 017c 094B     		ldr	r3, .L44+16
+ 438 017e 1A70     		strb	r2, [r3]
+ 439              	.L34:
+ 158:BLEClient.c   ****     }
+ 440              		.loc 1 158 0 discriminator 5
+ 441 0180 FFF7FEFF 		bl	UART_SpiUartGetTxBufferSize
+ 442              	.LVL37:
+ 443 0184 084B     		ldr	r3, .L44+20
+ 444 0186 1B68     		ldr	r3, [r3]
+ 445 0188 1B04     		lsl	r3, r3, #16
+ 446 018a DB17     		asr	r3, r3, #31
+ 447 018c 8342     		cmp	r3, r0
+ 448 018e F7D1     		bne	.L34
+ 449              	.L18:
+ 161:BLEClient.c   **** 
+ 450              		.loc 1 161 0
+ 451              		@ sp needed
+ 452 0190 F7BD     		pop	{r0, r1, r2, r4, r5, r6, r7, pc}
+ 453              	.L45:
+ 454 0192 C046     		.align	2
+ 455              	.L44:
+ 456 0194 00000000 		.word	.LANCHOR0
+ 457 0198 00000000 		.word	DeviceInfo
+ 458 019c 00000000 		.word	.LC4
+ 459 01a0 05000000 		.word	.LC6
+ 460 01a4 00000000 		.word	STOP_SCAN_FLAG
+ 461 01a8 08022540 		.word	1076167176
+ 462              		.cfi_endproc
+ 463              	.LFE37:
+ 464              		.size	HandleScanDevices, .-HandleScanDevices
+ 465              		.section	.text.ScanDeviceInfoInit,"ax",%progbits
+ 466              		.align	1
+ 467              		.global	ScanDeviceInfoInit
+ 468              		.code	16
+ 469              		.thumb_func
+ 470              		.type	ScanDeviceInfoInit, %function
+ 471              	ScanDeviceInfoInit:
+ 472              	.LFB39:
+ 385:BLEClient.c   **** 
+ 386:BLEClient.c   **** 
+ 387:BLEClient.c   **** /******************************************************************************
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 17
+
+
+ 388:BLEClient.c   **** * Function Name: ScanDeviceInfoInit
+ 389:BLEClient.c   **** ***************************************************************************//**
+ 390:BLEClient.c   **** * 
+ 391:BLEClient.c   **** *  初始化存放扫描到的BLE设备信息空间
+ 392:BLEClient.c   **** * 
+ 393:BLEClient.c   **** * \return
+ 394:BLEClient.c   **** *  None
+ 395:BLEClient.c   **** * 
+ 396:BLEClient.c   **** ******************************************************************************/
+ 397:BLEClient.c   **** void ScanDeviceInfoInit(void)
+ 398:BLEClient.c   **** {
+ 473              		.loc 1 398 0
+ 474              		.cfi_startproc
+ 475 0000 70B5     		push	{r4, r5, r6, lr}
+ 476              		.cfi_def_cfa_offset 16
+ 477              		.cfi_offset 4, -16
+ 478              		.cfi_offset 5, -12
+ 479              		.cfi_offset 6, -8
+ 480              		.cfi_offset 14, -4
+ 399:BLEClient.c   ****     uint8_t i;
+ 400:BLEClient.c   ****     if(DeviceCount>DeviceListCount)
+ 481              		.loc 1 400 0
+ 482 0002 104D     		ldr	r5, .L53
+ 483 0004 104C     		ldr	r4, .L53+4
+ 484 0006 2E78     		ldrb	r6, [r5]
+ 485 0008 0A2E     		cmp	r6, #10
+ 486 000a 03D8     		bhi	.L51
+ 487 000c 1E23     		mov	r3, #30
+ 488 000e 5E43     		mul	r6, r3
+ 489 0010 3619     		add	r6, r6, r4
+ 490 0012 0EE0     		b	.L48
+ 491              	.L51:
+ 492 0014 0026     		mov	r6, #0
+ 493              	.L47:
+ 494 0016 3019     		add	r0, r6, r4
+ 401:BLEClient.c   ****     {
+ 402:BLEClient.c   ****         for(i=0;i<DeviceListCount;i++)
+ 403:BLEClient.c   ****         {
+ 404:BLEClient.c   ****            memset(DeviceInfo[i].DeviceList.bdAddr,0,6);
+ 495              		.loc 1 404 0 discriminator 3
+ 496 0018 0021     		mov	r1, #0
+ 497 001a 0622     		mov	r2, #6
+ 498 001c FFF7FEFF 		bl	memset
+ 499              	.LVL38:
+ 402:BLEClient.c   ****         {
+ 500              		.loc 1 402 0 discriminator 3
+ 501 0020 9623     		mov	r3, #150
+ 502 0022 1E36     		add	r6, r6, #30
+ 503 0024 5B00     		lsl	r3, r3, #1
+ 504 0026 9E42     		cmp	r6, r3
+ 505 0028 F5D1     		bne	.L47
+ 506              	.L50:
+ 405:BLEClient.c   ****         
+ 406:BLEClient.c   ****         }        
+ 407:BLEClient.c   ****     }
+ 408:BLEClient.c   ****     else
+ 409:BLEClient.c   ****     {
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 18
+
+
+ 410:BLEClient.c   ****         for(i=0;i<DeviceCount;i++)
+ 411:BLEClient.c   ****         {
+ 412:BLEClient.c   ****             memset(DeviceInfo[i].DeviceList.bdAddr,0,6);
+ 413:BLEClient.c   ****         }
+ 414:BLEClient.c   ****     }
+ 415:BLEClient.c   ****     //计数扫描到的设备清零，以便再次扫描时扫描到的设备信息覆盖旧的信
+ 416:BLEClient.c   ****       DeviceCount=0;
+ 507              		.loc 1 416 0
+ 508 002a 0023     		mov	r3, #0
+ 417:BLEClient.c   ****       flag=0;
+ 418:BLEClient.c   **** 
+ 419:BLEClient.c   **** }
+ 509              		.loc 1 419 0
+ 510              		@ sp needed
+ 416:BLEClient.c   ****       flag=0;
+ 511              		.loc 1 416 0
+ 512 002c 2B70     		strb	r3, [r5]
+ 417:BLEClient.c   ****       flag=0;
+ 513              		.loc 1 417 0
+ 514 002e 6B70     		strb	r3, [r5, #1]
+ 515              		.loc 1 419 0
+ 516 0030 70BD     		pop	{r4, r5, r6, pc}
+ 517              	.L48:
+ 410:BLEClient.c   ****         {
+ 518              		.loc 1 410 0 discriminator 1
+ 519 0032 B442     		cmp	r4, r6
+ 520 0034 F9D0     		beq	.L50
+ 412:BLEClient.c   ****         }
+ 521              		.loc 1 412 0 discriminator 3
+ 522 0036 201C     		mov	r0, r4
+ 523 0038 0021     		mov	r1, #0
+ 524 003a 0622     		mov	r2, #6
+ 525 003c FFF7FEFF 		bl	memset
+ 526              	.LVL39:
+ 527 0040 1E34     		add	r4, r4, #30
+ 528 0042 F6E7     		b	.L48
+ 529              	.L54:
+ 530              		.align	2
+ 531              	.L53:
+ 532 0044 00000000 		.word	.LANCHOR0
+ 533 0048 00000000 		.word	DeviceInfo
+ 534              		.cfi_endproc
+ 535              	.LFE39:
+ 536              		.size	ScanDeviceInfoInit, .-ScanDeviceInfoInit
+ 537              		.global	flag
+ 538              		.global	DeviceCount
+ 539              		.comm	DeviceInfo,300,1
+ 540              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 541              	.LC4:
+ 542 0000 4E554C4C 		.ascii	"NULL\000"
+ 542      00
+ 543              	.LC6:
+ 544 0005 424C4542 		.ascii	"BLEBLE-105\000"
+ 544      4C452D31 
+ 544      303500
+ 545              		.bss
+ 546              		.set	.LANCHOR0,. + 0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 19
+
+
+ 547              		.type	DeviceCount, %object
+ 548              		.size	DeviceCount, 1
+ 549              	DeviceCount:
+ 550 0000 00       		.space	1
+ 551              		.type	flag, %object
+ 552              		.size	flag, 1
+ 553              	flag:
+ 554 0001 00       		.space	1
+ 555              		.text
+ 556              	.Letext0:
+ 557              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 558              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 559              		.file 4 "Generated_Source\\PSoC4/cytypes.h"
+ 560              		.file 5 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 561              		.file 6 "Generated_Source\\PSoC4/BLE_Stack.h"
+ 562              		.file 7 "Generated_Source\\PSoC4/BLE_StackGap.h"
+ 563              		.file 8 "Generated_Source\\PSoC4/BLE.h"
+ 564              		.file 9 "BLEClient.h"
+ 565              		.file 10 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9
+ 566              		.file 11 "Generated_Source\\PSoC4/UART_SPI_UART.h"
+ 567              		.section	.debug_info,"",%progbits
+ 568              	.Ldebug_info0:
+ 569 0000 5B090000 		.4byte	0x95b
+ 570 0004 0400     		.2byte	0x4
+ 571 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 572 000a 04       		.byte	0x4
+ 573 000b 01       		.uleb128 0x1
+ 574 000c 74000000 		.4byte	.LASF190
+ 575 0010 01       		.byte	0x1
+ 576 0011 C5120000 		.4byte	.LASF191
+ 577 0015 59110000 		.4byte	.LASF192
+ 578 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 579 001d 00000000 		.4byte	0
+ 580 0021 00000000 		.4byte	.Ldebug_line0
+ 581 0025 02       		.uleb128 0x2
+ 582 0026 37030000 		.4byte	.LASF0
+ 583 002a 02       		.byte	0x2
+ 584 002b 1B       		.byte	0x1b
+ 585 002c 30000000 		.4byte	0x30
+ 586 0030 03       		.uleb128 0x3
+ 587 0031 01       		.byte	0x1
+ 588 0032 06       		.byte	0x6
+ 589 0033 04040000 		.4byte	.LASF2
+ 590 0037 02       		.uleb128 0x2
+ 591 0038 19020000 		.4byte	.LASF1
+ 592 003c 02       		.byte	0x2
+ 593 003d 1D       		.byte	0x1d
+ 594 003e 42000000 		.4byte	0x42
+ 595 0042 03       		.uleb128 0x3
+ 596 0043 01       		.byte	0x1
+ 597 0044 08       		.byte	0x8
+ 598 0045 ED0D0000 		.4byte	.LASF3
+ 599 0049 03       		.uleb128 0x3
+ 600 004a 02       		.byte	0x2
+ 601 004b 05       		.byte	0x5
+ 602 004c 320E0000 		.4byte	.LASF4
+ 603 0050 03       		.uleb128 0x3
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 20
+
+
+ 604 0051 02       		.byte	0x2
+ 605 0052 07       		.byte	0x7
+ 606 0053 E4100000 		.4byte	.LASF5
+ 607 0057 03       		.uleb128 0x3
+ 608 0058 04       		.byte	0x4
+ 609 0059 05       		.byte	0x5
+ 610 005a 6C020000 		.4byte	.LASF6
+ 611 005e 03       		.uleb128 0x3
+ 612 005f 04       		.byte	0x4
+ 613 0060 07       		.byte	0x7
+ 614 0061 A0070000 		.4byte	.LASF7
+ 615 0065 03       		.uleb128 0x3
+ 616 0066 08       		.byte	0x8
+ 617 0067 05       		.byte	0x5
+ 618 0068 F6030000 		.4byte	.LASF8
+ 619 006c 03       		.uleb128 0x3
+ 620 006d 08       		.byte	0x8
+ 621 006e 07       		.byte	0x7
+ 622 006f BE060000 		.4byte	.LASF9
+ 623 0073 04       		.uleb128 0x4
+ 624 0074 04       		.byte	0x4
+ 625 0075 05       		.byte	0x5
+ 626 0076 696E7400 		.ascii	"int\000"
+ 627 007a 03       		.uleb128 0x3
+ 628 007b 04       		.byte	0x4
+ 629 007c 07       		.byte	0x7
+ 630 007d BD0F0000 		.4byte	.LASF10
+ 631 0081 02       		.uleb128 0x2
+ 632 0082 16110000 		.4byte	.LASF11
+ 633 0086 03       		.byte	0x3
+ 634 0087 14       		.byte	0x14
+ 635 0088 25000000 		.4byte	0x25
+ 636 008c 02       		.uleb128 0x2
+ 637 008d E7110000 		.4byte	.LASF12
+ 638 0091 03       		.byte	0x3
+ 639 0092 15       		.byte	0x15
+ 640 0093 37000000 		.4byte	0x37
+ 641 0097 05       		.uleb128 0x5
+ 642 0098 A7050000 		.4byte	.LASF13
+ 643 009c 04       		.byte	0x4
+ 644 009d 3801     		.2byte	0x138
+ 645 009f 42000000 		.4byte	0x42
+ 646 00a3 05       		.uleb128 0x5
+ 647 00a4 FC050000 		.4byte	.LASF14
+ 648 00a8 04       		.byte	0x4
+ 649 00a9 3A01     		.2byte	0x13a
+ 650 00ab 5E000000 		.4byte	0x5e
+ 651 00af 05       		.uleb128 0x5
+ 652 00b0 D4080000 		.4byte	.LASF15
+ 653 00b4 04       		.byte	0x4
+ 654 00b5 3B01     		.2byte	0x13b
+ 655 00b7 30000000 		.4byte	0x30
+ 656 00bb 03       		.uleb128 0x3
+ 657 00bc 04       		.byte	0x4
+ 658 00bd 04       		.byte	0x4
+ 659 00be ED0C0000 		.4byte	.LASF16
+ 660 00c2 03       		.uleb128 0x3
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 21
+
+
+ 661 00c3 08       		.byte	0x8
+ 662 00c4 04       		.byte	0x4
+ 663 00c5 D7050000 		.4byte	.LASF17
+ 664 00c9 03       		.uleb128 0x3
+ 665 00ca 01       		.byte	0x1
+ 666 00cb 08       		.byte	0x8
+ 667 00cc 760F0000 		.4byte	.LASF18
+ 668 00d0 05       		.uleb128 0x5
+ 669 00d1 2F0A0000 		.4byte	.LASF19
+ 670 00d5 04       		.byte	0x4
+ 671 00d6 E401     		.2byte	0x1e4
+ 672 00d8 DC000000 		.4byte	0xdc
+ 673 00dc 06       		.uleb128 0x6
+ 674 00dd A3000000 		.4byte	0xa3
+ 675 00e1 02       		.uleb128 0x2
+ 676 00e2 5A010000 		.4byte	.LASF20
+ 677 00e6 05       		.byte	0x5
+ 678 00e7 D4       		.byte	0xd4
+ 679 00e8 7A000000 		.4byte	0x7a
+ 680 00ec 03       		.uleb128 0x3
+ 681 00ed 04       		.byte	0x4
+ 682 00ee 07       		.byte	0x7
+ 683 00ef E60A0000 		.4byte	.LASF21
+ 684 00f3 07       		.uleb128 0x7
+ 685 00f4 04       		.byte	0x4
+ 686 00f5 08       		.uleb128 0x8
+ 687 00f6 04       		.byte	0x4
+ 688 00f7 FB000000 		.4byte	0xfb
+ 689 00fb 09       		.uleb128 0x9
+ 690 00fc C9000000 		.4byte	0xc9
+ 691 0100 0A       		.uleb128 0xa
+ 692 0101 01       		.byte	0x1
+ 693 0102 06       		.byte	0x6
+ 694 0103 4201     		.2byte	0x142
+ 695 0105 BD020000 		.4byte	0x2bd
+ 696 0109 0B       		.uleb128 0xb
+ 697 010a 73080000 		.4byte	.LASF22
+ 698 010e 00       		.sleb128 0
+ 699 010f 0B       		.uleb128 0xb
+ 700 0110 43040000 		.4byte	.LASF23
+ 701 0114 01       		.sleb128 1
+ 702 0115 0B       		.uleb128 0xb
+ 703 0116 5A020000 		.4byte	.LASF24
+ 704 011a 02       		.sleb128 2
+ 705 011b 0B       		.uleb128 0xb
+ 706 011c CB100000 		.4byte	.LASF25
+ 707 0120 03       		.sleb128 3
+ 708 0121 0B       		.uleb128 0xb
+ 709 0122 E5020000 		.4byte	.LASF26
+ 710 0126 04       		.sleb128 4
+ 711 0127 0B       		.uleb128 0xb
+ 712 0128 23000000 		.4byte	.LASF27
+ 713 012c 05       		.sleb128 5
+ 714 012d 0B       		.uleb128 0xb
+ 715 012e A8080000 		.4byte	.LASF28
+ 716 0132 06       		.sleb128 6
+ 717 0133 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 22
+
+
+ 718 0134 350A0000 		.4byte	.LASF29
+ 719 0138 20       		.sleb128 32
+ 720 0139 0B       		.uleb128 0xb
+ 721 013a B6040000 		.4byte	.LASF30
+ 722 013e 21       		.sleb128 33
+ 723 013f 0B       		.uleb128 0xb
+ 724 0140 0A090000 		.4byte	.LASF31
+ 725 0144 22       		.sleb128 34
+ 726 0145 0B       		.uleb128 0xb
+ 727 0146 D2090000 		.4byte	.LASF32
+ 728 014a 23       		.sleb128 35
+ 729 014b 0B       		.uleb128 0xb
+ 730 014c F50B0000 		.4byte	.LASF33
+ 731 0150 24       		.sleb128 36
+ 732 0151 0B       		.uleb128 0xb
+ 733 0152 0E0B0000 		.4byte	.LASF34
+ 734 0156 25       		.sleb128 37
+ 735 0157 0B       		.uleb128 0xb
+ 736 0158 49050000 		.4byte	.LASF35
+ 737 015c 26       		.sleb128 38
+ 738 015d 0B       		.uleb128 0xb
+ 739 015e 2E090000 		.4byte	.LASF36
+ 740 0162 27       		.sleb128 39
+ 741 0163 0B       		.uleb128 0xb
+ 742 0164 9B0F0000 		.4byte	.LASF37
+ 743 0168 28       		.sleb128 40
+ 744 0169 0B       		.uleb128 0xb
+ 745 016a 6B030000 		.4byte	.LASF38
+ 746 016e 29       		.sleb128 41
+ 747 016f 0B       		.uleb128 0xb
+ 748 0170 61010000 		.4byte	.LASF39
+ 749 0174 2A       		.sleb128 42
+ 750 0175 0B       		.uleb128 0xb
+ 751 0176 FA020000 		.4byte	.LASF40
+ 752 017a 2B       		.sleb128 43
+ 753 017b 0B       		.uleb128 0xb
+ 754 017c A1120000 		.4byte	.LASF41
+ 755 0180 2C       		.sleb128 44
+ 756 0181 0B       		.uleb128 0xb
+ 757 0182 88030000 		.4byte	.LASF42
+ 758 0186 2D       		.sleb128 45
+ 759 0187 0B       		.uleb128 0xb
+ 760 0188 FB0D0000 		.4byte	.LASF43
+ 761 018c 2E       		.sleb128 46
+ 762 018d 0B       		.uleb128 0xb
+ 763 018e B6010000 		.4byte	.LASF44
+ 764 0192 2F       		.sleb128 47
+ 765 0193 0B       		.uleb128 0xb
+ 766 0194 630B0000 		.4byte	.LASF45
+ 767 0198 30       		.sleb128 48
+ 768 0199 0B       		.uleb128 0xb
+ 769 019a 18130000 		.4byte	.LASF46
+ 770 019e 31       		.sleb128 49
+ 771 019f 0B       		.uleb128 0xb
+ 772 01a0 420B0000 		.4byte	.LASF47
+ 773 01a4 32       		.sleb128 50
+ 774 01a5 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 23
+
+
+ 775 01a6 490F0000 		.4byte	.LASF48
+ 776 01aa 33       		.sleb128 51
+ 777 01ab 0B       		.uleb128 0xb
+ 778 01ac 3C060000 		.4byte	.LASF49
+ 779 01b0 C000     		.sleb128 64
+ 780 01b2 0B       		.uleb128 0xb
+ 781 01b3 F8090000 		.4byte	.LASF50
+ 782 01b7 C100     		.sleb128 65
+ 783 01b9 0B       		.uleb128 0xb
+ 784 01ba 59130000 		.4byte	.LASF51
+ 785 01be C200     		.sleb128 66
+ 786 01c0 0B       		.uleb128 0xb
+ 787 01c1 3B110000 		.4byte	.LASF52
+ 788 01c5 C300     		.sleb128 67
+ 789 01c7 0B       		.uleb128 0xb
+ 790 01c8 CC070000 		.4byte	.LASF53
+ 791 01cc C400     		.sleb128 68
+ 792 01ce 0B       		.uleb128 0xb
+ 793 01cf B90C0000 		.4byte	.LASF54
+ 794 01d3 C500     		.sleb128 69
+ 795 01d5 0B       		.uleb128 0xb
+ 796 01d6 C50A0000 		.4byte	.LASF55
+ 797 01da C600     		.sleb128 70
+ 798 01dc 0B       		.uleb128 0xb
+ 799 01dd 8A080000 		.4byte	.LASF56
+ 800 01e1 C700     		.sleb128 71
+ 801 01e3 0B       		.uleb128 0xb
+ 802 01e4 65120000 		.4byte	.LASF57
+ 803 01e8 C800     		.sleb128 72
+ 804 01ea 0B       		.uleb128 0xb
+ 805 01eb CD040000 		.4byte	.LASF58
+ 806 01ef C900     		.sleb128 73
+ 807 01f1 0B       		.uleb128 0xb
+ 808 01f2 53100000 		.4byte	.LASF59
+ 809 01f6 CA00     		.sleb128 74
+ 810 01f8 0B       		.uleb128 0xb
+ 811 01f9 FA010000 		.4byte	.LASF60
+ 812 01fd CB00     		.sleb128 75
+ 813 01ff 0B       		.uleb128 0xb
+ 814 0200 B2070000 		.4byte	.LASF61
+ 815 0204 CC00     		.sleb128 76
+ 816 0206 0B       		.uleb128 0xb
+ 817 0207 280B0000 		.4byte	.LASF62
+ 818 020b CD00     		.sleb128 77
+ 819 020d 0B       		.uleb128 0xb
+ 820 020e 00050000 		.4byte	.LASF63
+ 821 0212 CE00     		.sleb128 78
+ 822 0214 0B       		.uleb128 0xb
+ 823 0215 B10E0000 		.4byte	.LASF64
+ 824 0219 CF00     		.sleb128 79
+ 825 021b 0B       		.uleb128 0xb
+ 826 021c D9080000 		.4byte	.LASF65
+ 827 0220 D000     		.sleb128 80
+ 828 0222 0B       		.uleb128 0xb
+ 829 0223 B8050000 		.4byte	.LASF66
+ 830 0227 D100     		.sleb128 81
+ 831 0229 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 24
+
+
+ 832 022a 370C0000 		.4byte	.LASF67
+ 833 022e D200     		.sleb128 82
+ 834 0230 0B       		.uleb128 0xb
+ 835 0231 3C0E0000 		.4byte	.LASF68
+ 836 0235 D300     		.sleb128 83
+ 837 0237 0B       		.uleb128 0xb
+ 838 0238 0A0F0000 		.4byte	.LASF69
+ 839 023c D400     		.sleb128 84
+ 840 023e 0B       		.uleb128 0xb
+ 841 023f EA070000 		.4byte	.LASF70
+ 842 0243 D500     		.sleb128 85
+ 843 0245 0B       		.uleb128 0xb
+ 844 0246 27050000 		.4byte	.LASF71
+ 845 024a D600     		.sleb128 86
+ 846 024c 0B       		.uleb128 0xb
+ 847 024d CF0F0000 		.4byte	.LASF72
+ 848 0251 D700     		.sleb128 87
+ 849 0253 0B       		.uleb128 0xb
+ 850 0254 0E080000 		.4byte	.LASF73
+ 851 0258 D800     		.sleb128 88
+ 852 025a 0B       		.uleb128 0xb
+ 853 025b 9D090000 		.4byte	.LASF74
+ 854 025f F000     		.sleb128 112
+ 855 0261 0B       		.uleb128 0xb
+ 856 0262 F2120000 		.4byte	.LASF75
+ 857 0266 F100     		.sleb128 113
+ 858 0268 0B       		.uleb128 0xb
+ 859 0269 130A0000 		.4byte	.LASF76
+ 860 026d F200     		.sleb128 114
+ 861 026f 0B       		.uleb128 0xb
+ 862 0270 23020000 		.4byte	.LASF77
+ 863 0274 F300     		.sleb128 115
+ 864 0276 0B       		.uleb128 0xb
+ 865 0277 7C0C0000 		.4byte	.LASF78
+ 866 027b F400     		.sleb128 116
+ 867 027d 0B       		.uleb128 0xb
+ 868 027e D1120000 		.4byte	.LASF79
+ 869 0282 F500     		.sleb128 117
+ 870 0284 0B       		.uleb128 0xb
+ 871 0285 8A010000 		.4byte	.LASF80
+ 872 0289 F600     		.sleb128 118
+ 873 028b 0B       		.uleb128 0xb
+ 874 028c 02010000 		.4byte	.LASF81
+ 875 0290 F700     		.sleb128 119
+ 876 0292 0B       		.uleb128 0xb
+ 877 0293 00000000 		.4byte	.LASF82
+ 878 0297 F800     		.sleb128 120
+ 879 0299 0B       		.uleb128 0xb
+ 880 029a 30100000 		.4byte	.LASF83
+ 881 029e F900     		.sleb128 121
+ 882 02a0 0B       		.uleb128 0xb
+ 883 02a1 9A060000 		.4byte	.LASF84
+ 884 02a5 FA00     		.sleb128 122
+ 885 02a7 0B       		.uleb128 0xb
+ 886 02a8 19030000 		.4byte	.LASF85
+ 887 02ac FA01     		.sleb128 250
+ 888 02ae 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 25
+
+
+ 889 02af 2F070000 		.4byte	.LASF86
+ 890 02b3 FB01     		.sleb128 251
+ 891 02b5 0B       		.uleb128 0xb
+ 892 02b6 1F060000 		.4byte	.LASF87
+ 893 02ba FF01     		.sleb128 255
+ 894 02bc 00       		.byte	0
+ 895 02bd 0A       		.uleb128 0xa
+ 896 02be 02       		.byte	0x2
+ 897 02bf 06       		.byte	0x6
+ 898 02c0 FF02     		.2byte	0x2ff
+ 899 02c2 8D030000 		.4byte	0x38d
+ 900 02c6 0B       		.uleb128 0xb
+ 901 02c7 2D060000 		.4byte	.LASF88
+ 902 02cb 00       		.sleb128 0
+ 903 02cc 0B       		.uleb128 0xb
+ 904 02cd DE050000 		.4byte	.LASF89
+ 905 02d1 01       		.sleb128 1
+ 906 02d2 0B       		.uleb128 0xb
+ 907 02d3 1D110000 		.4byte	.LASF90
+ 908 02d7 02       		.sleb128 2
+ 909 02d8 0B       		.uleb128 0xb
+ 910 02d9 21010000 		.4byte	.LASF91
+ 911 02dd 03       		.sleb128 3
+ 912 02de 0B       		.uleb128 0xb
+ 913 02df C2020000 		.4byte	.LASF92
+ 914 02e3 04       		.sleb128 4
+ 915 02e4 0B       		.uleb128 0xb
+ 916 02e5 11070000 		.4byte	.LASF93
+ 917 02e9 05       		.sleb128 5
+ 918 02ea 0B       		.uleb128 0xb
+ 919 02eb 7F0E0000 		.4byte	.LASF94
+ 920 02ef 06       		.sleb128 6
+ 921 02f0 0B       		.uleb128 0xb
+ 922 02f1 99040000 		.4byte	.LASF95
+ 923 02f5 07       		.sleb128 7
+ 924 02f6 0B       		.uleb128 0xb
+ 925 02f7 2B0F0000 		.4byte	.LASF96
+ 926 02fb 08       		.sleb128 8
+ 927 02fc 0B       		.uleb128 0xb
+ 928 02fd 8C120000 		.4byte	.LASF97
+ 929 0301 09       		.sleb128 9
+ 930 0302 0B       		.uleb128 0xb
+ 931 0303 970D0000 		.4byte	.LASF98
+ 932 0307 0A       		.sleb128 10
+ 933 0308 0B       		.uleb128 0xb
+ 934 0309 7B0F0000 		.4byte	.LASF99
+ 935 030d 0B       		.sleb128 11
+ 936 030e 0B       		.uleb128 0xb
+ 937 030f 54030000 		.4byte	.LASF100
+ 938 0313 0C       		.sleb128 12
+ 939 0314 0B       		.uleb128 0xb
+ 940 0315 9D020000 		.4byte	.LASF101
+ 941 0319 0D       		.sleb128 13
+ 942 031a 0B       		.uleb128 0xb
+ 943 031b 59070000 		.4byte	.LASF102
+ 944 031f 0E       		.sleb128 14
+ 945 0320 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 26
+
+
+ 946 0321 27120000 		.4byte	.LASF103
+ 947 0325 0F       		.sleb128 15
+ 948 0326 0B       		.uleb128 0xb
+ 949 0327 96100000 		.4byte	.LASF104
+ 950 032b 10       		.sleb128 16
+ 951 032c 0B       		.uleb128 0xb
+ 952 032d 31080000 		.4byte	.LASF105
+ 953 0331 11       		.sleb128 17
+ 954 0332 0B       		.uleb128 0xb
+ 955 0333 71050000 		.4byte	.LASF106
+ 956 0337 12       		.sleb128 18
+ 957 0338 0B       		.uleb128 0xb
+ 958 0339 77130000 		.4byte	.LASF107
+ 959 033d 13       		.sleb128 19
+ 960 033e 0B       		.uleb128 0xb
+ 961 033f 77040000 		.4byte	.LASF108
+ 962 0343 27       		.sleb128 39
+ 963 0344 0B       		.uleb128 0xb
+ 964 0345 71100000 		.4byte	.LASF109
+ 965 0349 28       		.sleb128 40
+ 966 034a 0B       		.uleb128 0xb
+ 967 034b 0B120000 		.4byte	.LASF110
+ 968 034f 29       		.sleb128 41
+ 969 0350 0B       		.uleb128 0xb
+ 970 0351 ED0E0000 		.4byte	.LASF111
+ 971 0355 2A       		.sleb128 42
+ 972 0356 0B       		.uleb128 0xb
+ 973 0357 10040000 		.4byte	.LASF112
+ 974 035b 2B       		.sleb128 43
+ 975 035c 0B       		.uleb128 0xb
+ 976 035d 990E0000 		.4byte	.LASF113
+ 977 0361 2C       		.sleb128 44
+ 978 0362 0B       		.uleb128 0xb
+ 979 0363 EF110000 		.4byte	.LASF114
+ 980 0367 FE01     		.sleb128 254
+ 981 0369 0B       		.uleb128 0xb
+ 982 036a 9C0A0000 		.4byte	.LASF115
+ 983 036e FF01     		.sleb128 255
+ 984 0370 0B       		.uleb128 0xb
+ 985 0371 5A080000 		.4byte	.LASF116
+ 986 0375 8002     		.sleb128 256
+ 987 0377 0B       		.uleb128 0xb
+ 988 0378 AC0A0000 		.4byte	.LASF117
+ 989 037c 8102     		.sleb128 257
+ 990 037e 0B       		.uleb128 0xb
+ 991 037f B10D0000 		.4byte	.LASF118
+ 992 0383 8202     		.sleb128 258
+ 993 0385 0B       		.uleb128 0xb
+ 994 0386 E6040000 		.4byte	.LASF119
+ 995 038a 8302     		.sleb128 259
+ 996 038c 00       		.byte	0
+ 997 038d 05       		.uleb128 0x5
+ 998 038e 1D100000 		.4byte	.LASF120
+ 999 0392 06       		.byte	0x6
+ 1000 0393 6B03     		.2byte	0x36b
+ 1001 0395 BD020000 		.4byte	0x2bd
+ 1002 0399 0C       		.uleb128 0xc
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 27
+
+
+ 1003 039a 07       		.byte	0x7
+ 1004 039b 06       		.byte	0x6
+ 1005 039c 2804     		.2byte	0x428
+ 1006 039e BD030000 		.4byte	0x3bd
+ 1007 03a2 0D       		.uleb128 0xd
+ 1008 03a3 C1110000 		.4byte	.LASF121
+ 1009 03a7 06       		.byte	0x6
+ 1010 03a8 2B04     		.2byte	0x42b
+ 1011 03aa BD030000 		.4byte	0x3bd
+ 1012 03ae 00       		.byte	0
+ 1013 03af 0D       		.uleb128 0xd
+ 1014 03b0 55020000 		.4byte	.LASF122
+ 1015 03b4 06       		.byte	0x6
+ 1016 03b5 2D04     		.2byte	0x42d
+ 1017 03b7 97000000 		.4byte	0x97
+ 1018 03bb 06       		.byte	0x6
+ 1019 03bc 00       		.byte	0
+ 1020 03bd 0E       		.uleb128 0xe
+ 1021 03be 97000000 		.4byte	0x97
+ 1022 03c2 CD030000 		.4byte	0x3cd
+ 1023 03c6 0F       		.uleb128 0xf
+ 1024 03c7 EC000000 		.4byte	0xec
+ 1025 03cb 05       		.byte	0x5
+ 1026 03cc 00       		.byte	0
+ 1027 03cd 05       		.uleb128 0x5
+ 1028 03ce 40030000 		.4byte	.LASF123
+ 1029 03d2 06       		.byte	0x6
+ 1030 03d3 2E04     		.2byte	0x42e
+ 1031 03d5 99030000 		.4byte	0x399
+ 1032 03d9 10       		.uleb128 0x10
+ 1033 03da 01       		.byte	0x1
+ 1034 03db 07       		.byte	0x7
+ 1035 03dc E4       		.byte	0xe4
+ 1036 03dd 00040000 		.4byte	0x400
+ 1037 03e1 0B       		.uleb128 0xb
+ 1038 03e2 B0130000 		.4byte	.LASF124
+ 1039 03e6 00       		.sleb128 0
+ 1040 03e7 0B       		.uleb128 0xb
+ 1041 03e8 D5060000 		.4byte	.LASF125
+ 1042 03ec 01       		.sleb128 1
+ 1043 03ed 0B       		.uleb128 0xb
+ 1044 03ee C8110000 		.4byte	.LASF126
+ 1045 03f2 02       		.sleb128 2
+ 1046 03f3 0B       		.uleb128 0xb
+ 1047 03f4 790A0000 		.4byte	.LASF127
+ 1048 03f8 03       		.sleb128 3
+ 1049 03f9 0B       		.uleb128 0xb
+ 1050 03fa 46010000 		.4byte	.LASF128
+ 1051 03fe 04       		.sleb128 4
+ 1052 03ff 00       		.byte	0
+ 1053 0400 02       		.uleb128 0x2
+ 1054 0401 650C0000 		.4byte	.LASF129
+ 1055 0405 07       		.byte	0x7
+ 1056 0406 F4       		.byte	0xf4
+ 1057 0407 D9030000 		.4byte	0x3d9
+ 1058 040b 0C       		.uleb128 0xc
+ 1059 040c 14       		.byte	0x14
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 28
+
+
+ 1060 040d 07       		.byte	0x7
+ 1061 040e 0C03     		.2byte	0x30c
+ 1062 0410 63040000 		.4byte	0x463
+ 1063 0414 0D       		.uleb128 0xd
+ 1064 0415 B7110000 		.4byte	.LASF130
+ 1065 0419 07       		.byte	0x7
+ 1066 041a 1503     		.2byte	0x315
+ 1067 041c 00040000 		.4byte	0x400
+ 1068 0420 00       		.byte	0
+ 1069 0421 0D       		.uleb128 0xd
+ 1070 0422 E00C0000 		.4byte	.LASF131
+ 1071 0426 07       		.byte	0x7
+ 1072 0427 1D03     		.2byte	0x31d
+ 1073 0429 97000000 		.4byte	0x97
+ 1074 042d 01       		.byte	0x1
+ 1075 042e 0D       		.uleb128 0xd
+ 1076 042f AD050000 		.4byte	.LASF132
+ 1077 0433 07       		.byte	0x7
+ 1078 0434 2103     		.2byte	0x321
+ 1079 0436 63040000 		.4byte	0x463
+ 1080 043a 04       		.byte	0x4
+ 1081 043b 0D       		.uleb128 0xd
+ 1082 043c 92060000 		.4byte	.LASF133
+ 1083 0440 07       		.byte	0x7
+ 1084 0441 2403     		.2byte	0x324
+ 1085 0443 97000000 		.4byte	0x97
+ 1086 0447 08       		.byte	0x8
+ 1087 0448 0D       		.uleb128 0xd
+ 1088 0449 55080000 		.4byte	.LASF134
+ 1089 044d 07       		.byte	0x7
+ 1090 044e 2703     		.2byte	0x327
+ 1091 0450 63040000 		.4byte	0x463
+ 1092 0454 0C       		.byte	0xc
+ 1093 0455 0D       		.uleb128 0xd
+ 1094 0456 CA0F0000 		.4byte	.LASF135
+ 1095 045a 07       		.byte	0x7
+ 1096 045b 2C03     		.2byte	0x32c
+ 1097 045d AF000000 		.4byte	0xaf
+ 1098 0461 10       		.byte	0x10
+ 1099 0462 00       		.byte	0
+ 1100 0463 08       		.uleb128 0x8
+ 1101 0464 04       		.byte	0x4
+ 1102 0465 97000000 		.4byte	0x97
+ 1103 0469 05       		.uleb128 0x5
+ 1104 046a F7100000 		.4byte	.LASF136
+ 1105 046e 07       		.byte	0x7
+ 1106 046f 2E03     		.2byte	0x32e
+ 1107 0471 0B040000 		.4byte	0x40b
+ 1108 0475 0A       		.uleb128 0xa
+ 1109 0476 01       		.byte	0x1
+ 1110 0477 08       		.byte	0x8
+ 1111 0478 7701     		.2byte	0x177
+ 1112 047a 3F050000 		.4byte	0x53f
+ 1113 047e 0B       		.uleb128 0xb
+ 1114 047f 41020000 		.4byte	.LASF137
+ 1115 0483 01       		.sleb128 1
+ 1116 0484 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 29
+
+
+ 1117 0485 75020000 		.4byte	.LASF138
+ 1118 0489 02       		.sleb128 2
+ 1119 048a 0B       		.uleb128 0xb
+ 1120 048b DF010000 		.4byte	.LASF139
+ 1121 048f 03       		.sleb128 3
+ 1122 0490 0B       		.uleb128 0xb
+ 1123 0491 2E0D0000 		.4byte	.LASF140
+ 1124 0495 04       		.sleb128 4
+ 1125 0496 0B       		.uleb128 0xb
+ 1126 0497 03060000 		.4byte	.LASF141
+ 1127 049b 05       		.sleb128 5
+ 1128 049c 0B       		.uleb128 0xb
+ 1129 049d F2060000 		.4byte	.LASF142
+ 1130 04a1 06       		.sleb128 6
+ 1131 04a2 0B       		.uleb128 0xb
+ 1132 04a3 3C130000 		.4byte	.LASF143
+ 1133 04a7 07       		.sleb128 7
+ 1134 04a8 0B       		.uleb128 0xb
+ 1135 04a9 D40D0000 		.4byte	.LASF144
+ 1136 04ad 08       		.sleb128 8
+ 1137 04ae 0B       		.uleb128 0xb
+ 1138 04af 4C120000 		.4byte	.LASF145
+ 1139 04b3 09       		.sleb128 9
+ 1140 04b4 0B       		.uleb128 0xb
+ 1141 04b5 150D0000 		.4byte	.LASF146
+ 1142 04b9 0A       		.sleb128 10
+ 1143 04ba 0B       		.uleb128 0xb
+ 1144 04bb 82070000 		.4byte	.LASF147
+ 1145 04bf 0D       		.sleb128 13
+ 1146 04c0 0B       		.uleb128 0xb
+ 1147 04c1 EF0A0000 		.4byte	.LASF148
+ 1148 04c5 0E       		.sleb128 14
+ 1149 04c6 0B       		.uleb128 0xb
+ 1150 04c7 110C0000 		.4byte	.LASF149
+ 1151 04cb 0F       		.sleb128 15
+ 1152 04cc 0B       		.uleb128 0xb
+ 1153 04cd 740D0000 		.4byte	.LASF150
+ 1154 04d1 10       		.sleb128 16
+ 1155 04d2 0B       		.uleb128 0xb
+ 1156 04d3 9A0C0000 		.4byte	.LASF151
+ 1157 04d7 10       		.sleb128 16
+ 1158 04d8 0B       		.uleb128 0xb
+ 1159 04d9 F30C0000 		.4byte	.LASF152
+ 1160 04dd 11       		.sleb128 17
+ 1161 04de 0B       		.uleb128 0xb
+ 1162 04df F80F0000 		.4byte	.LASF153
+ 1163 04e3 12       		.sleb128 18
+ 1164 04e4 0B       		.uleb128 0xb
+ 1165 04e5 5D0E0000 		.4byte	.LASF154
+ 1166 04e9 14       		.sleb128 20
+ 1167 04ea 0B       		.uleb128 0xb
+ 1168 04eb 6D090000 		.4byte	.LASF155
+ 1169 04ef 15       		.sleb128 21
+ 1170 04f0 0B       		.uleb128 0xb
+ 1171 04f1 A20B0000 		.4byte	.LASF156
+ 1172 04f5 16       		.sleb128 22
+ 1173 04f6 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 30
+
+
+ 1174 04f7 B1030000 		.4byte	.LASF157
+ 1175 04fb 17       		.sleb128 23
+ 1176 04fc 0B       		.uleb128 0xb
+ 1177 04fd 56040000 		.4byte	.LASF158
+ 1178 0501 18       		.sleb128 24
+ 1179 0502 0B       		.uleb128 0xb
+ 1180 0503 C10B0000 		.4byte	.LASF159
+ 1181 0507 19       		.sleb128 25
+ 1182 0508 0B       		.uleb128 0xb
+ 1183 0509 840B0000 		.4byte	.LASF160
+ 1184 050d 1A       		.sleb128 26
+ 1185 050e 0B       		.uleb128 0xb
+ 1186 050f 590A0000 		.4byte	.LASF161
+ 1187 0513 1B       		.sleb128 27
+ 1188 0514 0B       		.uleb128 0xb
+ 1189 0515 5E000000 		.4byte	.LASF162
+ 1190 0519 1C       		.sleb128 28
+ 1191 051a 0B       		.uleb128 0xb
+ 1192 051b 70060000 		.4byte	.LASF163
+ 1193 051f 1D       		.sleb128 29
+ 1194 0520 0B       		.uleb128 0xb
+ 1195 0521 D2030000 		.4byte	.LASF164
+ 1196 0525 1E       		.sleb128 30
+ 1197 0526 0B       		.uleb128 0xb
+ 1198 0527 D00E0000 		.4byte	.LASF165
+ 1199 052b 1F       		.sleb128 31
+ 1200 052c 0B       		.uleb128 0xb
+ 1201 052d 3F000000 		.4byte	.LASF166
+ 1202 0531 20       		.sleb128 32
+ 1203 0532 0B       		.uleb128 0xb
+ 1204 0533 4D090000 		.4byte	.LASF167
+ 1205 0537 21       		.sleb128 33
+ 1206 0538 0B       		.uleb128 0xb
+ 1207 0539 DA0B0000 		.4byte	.LASF168
+ 1208 053d 3D       		.sleb128 61
+ 1209 053e 00       		.byte	0
+ 1210 053f 11       		.uleb128 0x11
+ 1211 0540 1E       		.byte	0x1e
+ 1212 0541 09       		.byte	0x9
+ 1213 0542 25       		.byte	0x25
+ 1214 0543 84050000 		.4byte	0x584
+ 1215 0547 12       		.uleb128 0x12
+ 1216 0548 8C0D0000 		.4byte	.LASF169
+ 1217 054c 09       		.byte	0x9
+ 1218 054d 27       		.byte	0x27
+ 1219 054e CD030000 		.4byte	0x3cd
+ 1220 0552 00       		.byte	0
+ 1221 0553 13       		.uleb128 0x13
+ 1222 0554 69647800 		.ascii	"idx\000"
+ 1223 0558 09       		.byte	0x9
+ 1224 0559 28       		.byte	0x28
+ 1225 055a 8C000000 		.4byte	0x8c
+ 1226 055e 07       		.byte	0x7
+ 1227 055f 12       		.uleb128 0x12
+ 1228 0560 CA0F0000 		.4byte	.LASF135
+ 1229 0564 09       		.byte	0x9
+ 1230 0565 29       		.byte	0x29
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 31
+
+
+ 1231 0566 81000000 		.4byte	0x81
+ 1232 056a 08       		.byte	0x8
+ 1233 056b 12       		.uleb128 0x12
+ 1234 056c AB010000 		.4byte	.LASF170
+ 1235 0570 09       		.byte	0x9
+ 1236 0571 2A       		.byte	0x2a
+ 1237 0572 84050000 		.4byte	0x584
+ 1238 0576 09       		.byte	0x9
+ 1239 0577 12       		.uleb128 0x12
+ 1240 0578 1E050000 		.4byte	.LASF171
+ 1241 057c 09       		.byte	0x9
+ 1242 057d 2C       		.byte	0x2c
+ 1243 057e 8C000000 		.4byte	0x8c
+ 1244 0582 1D       		.byte	0x1d
+ 1245 0583 00       		.byte	0
+ 1246 0584 0E       		.uleb128 0xe
+ 1247 0585 81000000 		.4byte	0x81
+ 1248 0589 94050000 		.4byte	0x594
+ 1249 058d 0F       		.uleb128 0xf
+ 1250 058e EC000000 		.4byte	0xec
+ 1251 0592 13       		.byte	0x13
+ 1252 0593 00       		.byte	0
+ 1253 0594 02       		.uleb128 0x2
+ 1254 0595 8B090000 		.4byte	.LASF172
+ 1255 0599 09       		.byte	0x9
+ 1256 059a 2D       		.byte	0x2d
+ 1257 059b 3F050000 		.4byte	0x53f
+ 1258 059f 14       		.uleb128 0x14
+ 1259 05a0 56060000 		.4byte	.LASF178
+ 1260 05a4 01       		.byte	0x1
+ 1261 05a5 AE       		.byte	0xae
+ 1262 05a6 00000000 		.4byte	.LFB38
+ 1263 05aa 9C000000 		.4byte	.LFE38-.LFB38
+ 1264 05ae 01       		.uleb128 0x1
+ 1265 05af 9C       		.byte	0x9c
+ 1266 05b0 71060000 		.4byte	0x671
+ 1267 05b4 15       		.uleb128 0x15
+ 1268 05b5 700F0000 		.4byte	.LASF173
+ 1269 05b9 01       		.byte	0x1
+ 1270 05ba AE       		.byte	0xae
+ 1271 05bb 71060000 		.4byte	0x671
+ 1272 05bf 00000000 		.4byte	.LLST0
+ 1273 05c3 15       		.uleb128 0x15
+ 1274 05c4 9F130000 		.4byte	.LASF174
+ 1275 05c8 01       		.byte	0x1
+ 1276 05c9 AE       		.byte	0xae
+ 1277 05ca 8C000000 		.4byte	0x8c
+ 1278 05ce 1E000000 		.4byte	.LLST1
+ 1279 05d2 16       		.uleb128 0x16
+ 1280 05d3 320C0000 		.4byte	.LASF175
+ 1281 05d7 01       		.byte	0x1
+ 1282 05d8 B0       		.byte	0xb0
+ 1283 05d9 71060000 		.4byte	0x671
+ 1284 05dd 3F000000 		.4byte	.LLST2
+ 1285 05e1 16       		.uleb128 0x16
+ 1286 05e2 0F110000 		.4byte	.LASF176
+ 1287 05e6 01       		.byte	0x1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 32
+
+
+ 1288 05e7 B1       		.byte	0xb1
+ 1289 05e8 8C000000 		.4byte	0x8c
+ 1290 05ec 5E000000 		.4byte	.LLST3
+ 1291 05f0 17       		.uleb128 0x17
+ 1292 05f1 6900     		.ascii	"i\000"
+ 1293 05f3 01       		.byte	0x1
+ 1294 05f4 B2       		.byte	0xb2
+ 1295 05f5 8C000000 		.4byte	0x8c
+ 1296 05f9 18       		.uleb128 0x18
+ 1297 05fa 580C0000 		.4byte	.LASF177
+ 1298 05fe 01       		.byte	0x1
+ 1299 05ff B2       		.byte	0xb2
+ 1300 0600 8C000000 		.4byte	0x8c
+ 1301 0604 19       		.uleb128 0x19
+ 1302 0605 42000000 		.4byte	.LVL5
+ 1303 0609 CF080000 		.4byte	0x8cf
+ 1304 060d 22060000 		.4byte	0x622
+ 1305 0611 1A       		.uleb128 0x1a
+ 1306 0612 01       		.uleb128 0x1
+ 1307 0613 52       		.byte	0x52
+ 1308 0614 01       		.uleb128 0x1
+ 1309 0615 44       		.byte	0x44
+ 1310 0616 1A       		.uleb128 0x1a
+ 1311 0617 01       		.uleb128 0x1
+ 1312 0618 51       		.byte	0x51
+ 1313 0619 01       		.uleb128 0x1
+ 1314 061a 30       		.byte	0x30
+ 1315 061b 1A       		.uleb128 0x1a
+ 1316 061c 01       		.uleb128 0x1
+ 1317 061d 50       		.byte	0x50
+ 1318 061e 02       		.uleb128 0x2
+ 1319 061f 75       		.byte	0x75
+ 1320 0620 00       		.sleb128 0
+ 1321 0621 00       		.byte	0
+ 1322 0622 19       		.uleb128 0x19
+ 1323 0623 4E000000 		.4byte	.LVL6
+ 1324 0627 EC080000 		.4byte	0x8ec
+ 1325 062b 3C060000 		.4byte	0x63c
+ 1326 062f 1A       		.uleb128 0x1a
+ 1327 0630 01       		.uleb128 0x1
+ 1328 0631 51       		.byte	0x51
+ 1329 0632 02       		.uleb128 0x2
+ 1330 0633 74       		.byte	0x74
+ 1331 0634 01       		.sleb128 1
+ 1332 0635 1A       		.uleb128 0x1a
+ 1333 0636 01       		.uleb128 0x1
+ 1334 0637 50       		.byte	0x50
+ 1335 0638 02       		.uleb128 0x2
+ 1336 0639 75       		.byte	0x75
+ 1337 063a 00       		.sleb128 0
+ 1338 063b 00       		.byte	0
+ 1339 063c 19       		.uleb128 0x19
+ 1340 063d 6C000000 		.4byte	.LVL9
+ 1341 0641 CF080000 		.4byte	0x8cf
+ 1342 0645 5A060000 		.4byte	0x65a
+ 1343 0649 1A       		.uleb128 0x1a
+ 1344 064a 01       		.uleb128 0x1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 33
+
+
+ 1345 064b 52       		.byte	0x52
+ 1346 064c 01       		.uleb128 0x1
+ 1347 064d 44       		.byte	0x44
+ 1348 064e 1A       		.uleb128 0x1a
+ 1349 064f 01       		.uleb128 0x1
+ 1350 0650 51       		.byte	0x51
+ 1351 0651 01       		.uleb128 0x1
+ 1352 0652 30       		.byte	0x30
+ 1353 0653 1A       		.uleb128 0x1a
+ 1354 0654 01       		.uleb128 0x1
+ 1355 0655 50       		.byte	0x50
+ 1356 0656 02       		.uleb128 0x2
+ 1357 0657 76       		.byte	0x76
+ 1358 0658 00       		.sleb128 0
+ 1359 0659 00       		.byte	0
+ 1360 065a 1B       		.uleb128 0x1b
+ 1361 065b 7C000000 		.4byte	.LVL10
+ 1362 065f EC080000 		.4byte	0x8ec
+ 1363 0663 1A       		.uleb128 0x1a
+ 1364 0664 01       		.uleb128 0x1
+ 1365 0665 51       		.byte	0x51
+ 1366 0666 02       		.uleb128 0x2
+ 1367 0667 74       		.byte	0x74
+ 1368 0668 01       		.sleb128 1
+ 1369 0669 1A       		.uleb128 0x1a
+ 1370 066a 01       		.uleb128 0x1
+ 1371 066b 50       		.byte	0x50
+ 1372 066c 02       		.uleb128 0x2
+ 1373 066d 76       		.byte	0x76
+ 1374 066e 00       		.sleb128 0
+ 1375 066f 00       		.byte	0
+ 1376 0670 00       		.byte	0
+ 1377 0671 08       		.uleb128 0x8
+ 1378 0672 04       		.byte	0x4
+ 1379 0673 8C000000 		.4byte	0x8c
+ 1380 0677 14       		.uleb128 0x14
+ 1381 0678 F8080000 		.4byte	.LASF179
+ 1382 067c 01       		.byte	0x1
+ 1383 067d 25       		.byte	0x25
+ 1384 067e 00000000 		.4byte	.LFB37
+ 1385 0682 AC010000 		.4byte	.LFE37-.LFB37
+ 1386 0686 01       		.uleb128 0x1
+ 1387 0687 9C       		.byte	0x9c
+ 1388 0688 1F080000 		.4byte	0x81f
+ 1389 068c 15       		.uleb128 0x15
+ 1390 068d 1F0E0000 		.4byte	.LASF180
+ 1391 0691 01       		.byte	0x1
+ 1392 0692 25       		.byte	0x25
+ 1393 0693 1F080000 		.4byte	0x81f
+ 1394 0697 9E000000 		.4byte	.LLST4
+ 1395 069b 1C       		.uleb128 0x1c
+ 1396 069c 6900     		.ascii	"i\000"
+ 1397 069e 01       		.byte	0x1
+ 1398 069f 29       		.byte	0x29
+ 1399 06a0 8C000000 		.4byte	0x8c
+ 1400 06a4 EE000000 		.4byte	.LLST5
+ 1401 06a8 1D       		.uleb128 0x1d
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 34
+
+
+ 1402 06a9 92020000 		.4byte	.LASF181
+ 1403 06ad 01       		.byte	0x1
+ 1404 06ae 2A       		.byte	0x2a
+ 1405 06af 8D030000 		.4byte	0x38d
+ 1406 06b3 00       		.byte	0
+ 1407 06b4 19       		.uleb128 0x19
+ 1408 06b5 3A000000 		.4byte	.LVL18
+ 1409 06b9 EC080000 		.4byte	0x8ec
+ 1410 06bd CD060000 		.4byte	0x6cd
+ 1411 06c1 1A       		.uleb128 0x1a
+ 1412 06c2 01       		.uleb128 0x1
+ 1413 06c3 52       		.byte	0x52
+ 1414 06c4 01       		.uleb128 0x1
+ 1415 06c5 36       		.byte	0x36
+ 1416 06c6 1A       		.uleb128 0x1a
+ 1417 06c7 01       		.uleb128 0x1
+ 1418 06c8 50       		.byte	0x50
+ 1419 06c9 02       		.uleb128 0x2
+ 1420 06ca 76       		.byte	0x76
+ 1421 06cb 00       		.sleb128 0
+ 1422 06cc 00       		.byte	0
+ 1423 06cd 19       		.uleb128 0x19
+ 1424 06ce 5A000000 		.4byte	.LVL19
+ 1425 06d2 EC080000 		.4byte	0x8ec
+ 1426 06d6 F0060000 		.4byte	0x6f0
+ 1427 06da 1A       		.uleb128 0x1a
+ 1428 06db 01       		.uleb128 0x1
+ 1429 06dc 52       		.byte	0x52
+ 1430 06dd 01       		.uleb128 0x1
+ 1431 06de 36       		.byte	0x36
+ 1432 06df 1A       		.uleb128 0x1a
+ 1433 06e0 01       		.uleb128 0x1
+ 1434 06e1 50       		.byte	0x50
+ 1435 06e2 0C       		.uleb128 0xc
+ 1436 06e3 75       		.byte	0x75
+ 1437 06e4 00       		.sleb128 0
+ 1438 06e5 91       		.byte	0x91
+ 1439 06e6 64       		.sleb128 -28
+ 1440 06e7 06       		.byte	0x6
+ 1441 06e8 1E       		.byte	0x1e
+ 1442 06e9 03       		.byte	0x3
+ 1443 06ea 00000000 		.4byte	DeviceInfo
+ 1444 06ee 22       		.byte	0x22
+ 1445 06ef 00       		.byte	0
+ 1446 06f0 1E       		.uleb128 0x1e
+ 1447 06f1 62000000 		.4byte	.LVL20
+ 1448 06f5 9F050000 		.4byte	0x59f
+ 1449 06f9 19       		.uleb128 0x19
+ 1450 06fa 8A000000 		.4byte	.LVL22
+ 1451 06fe CF080000 		.4byte	0x8cf
+ 1452 0702 12070000 		.4byte	0x712
+ 1453 0706 1A       		.uleb128 0x1a
+ 1454 0707 01       		.uleb128 0x1
+ 1455 0708 52       		.byte	0x52
+ 1456 0709 01       		.uleb128 0x1
+ 1457 070a 44       		.byte	0x44
+ 1458 070b 1A       		.uleb128 0x1a
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 35
+
+
+ 1459 070c 01       		.uleb128 0x1
+ 1460 070d 50       		.byte	0x50
+ 1461 070e 02       		.uleb128 0x2
+ 1462 070f 75       		.byte	0x75
+ 1463 0710 00       		.sleb128 0
+ 1464 0711 00       		.byte	0
+ 1465 0712 19       		.uleb128 0x19
+ 1466 0713 94000000 		.4byte	.LVL23
+ 1467 0717 EC080000 		.4byte	0x8ec
+ 1468 071b 34070000 		.4byte	0x734
+ 1469 071f 1A       		.uleb128 0x1a
+ 1470 0720 01       		.uleb128 0x1
+ 1471 0721 52       		.byte	0x52
+ 1472 0722 01       		.uleb128 0x1
+ 1473 0723 35       		.byte	0x35
+ 1474 0724 1A       		.uleb128 0x1a
+ 1475 0725 01       		.uleb128 0x1
+ 1476 0726 51       		.byte	0x51
+ 1477 0727 05       		.uleb128 0x5
+ 1478 0728 03       		.byte	0x3
+ 1479 0729 00000000 		.4byte	.LC4
+ 1480 072d 1A       		.uleb128 0x1a
+ 1481 072e 01       		.uleb128 0x1
+ 1482 072f 50       		.byte	0x50
+ 1483 0730 02       		.uleb128 0x2
+ 1484 0731 75       		.byte	0x75
+ 1485 0732 00       		.sleb128 0
+ 1486 0733 00       		.byte	0
+ 1487 0734 19       		.uleb128 0x19
+ 1488 0735 A6000000 		.4byte	.LVL24
+ 1489 0739 10090000 		.4byte	0x910
+ 1490 073d 5C070000 		.4byte	0x75c
+ 1491 0741 1A       		.uleb128 0x1a
+ 1492 0742 01       		.uleb128 0x1
+ 1493 0743 52       		.byte	0x52
+ 1494 0744 01       		.uleb128 0x1
+ 1495 0745 3A       		.byte	0x3a
+ 1496 0746 1A       		.uleb128 0x1a
+ 1497 0747 01       		.uleb128 0x1
+ 1498 0748 51       		.byte	0x51
+ 1499 0749 05       		.uleb128 0x5
+ 1500 074a 03       		.byte	0x3
+ 1501 074b 05000000 		.4byte	.LC6
+ 1502 074f 1A       		.uleb128 0x1a
+ 1503 0750 01       		.uleb128 0x1
+ 1504 0751 50       		.byte	0x50
+ 1505 0752 08       		.uleb128 0x8
+ 1506 0753 74       		.byte	0x74
+ 1507 0754 00       		.sleb128 0
+ 1508 0755 03       		.byte	0x3
+ 1509 0756 09000000 		.4byte	DeviceInfo+9
+ 1510 075a 22       		.byte	0x22
+ 1511 075b 00       		.byte	0
+ 1512 075c 1E       		.uleb128 0x1e
+ 1513 075d AE000000 		.4byte	.LVL25
+ 1514 0761 2F090000 		.4byte	0x92f
+ 1515 0765 1E       		.uleb128 0x1e
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 36
+
+
+ 1516 0766 B8000000 		.4byte	.LVL26
+ 1517 076a 37090000 		.4byte	0x937
+ 1518 076e 19       		.uleb128 0x19
+ 1519 076f E0000000 		.4byte	.LVL29
+ 1520 0773 43090000 		.4byte	0x943
+ 1521 0777 87070000 		.4byte	0x787
+ 1522 077b 1A       		.uleb128 0x1a
+ 1523 077c 01       		.uleb128 0x1
+ 1524 077d 52       		.byte	0x52
+ 1525 077e 01       		.uleb128 0x1
+ 1526 077f 36       		.byte	0x36
+ 1527 0780 1A       		.uleb128 0x1a
+ 1528 0781 01       		.uleb128 0x1
+ 1529 0782 51       		.byte	0x51
+ 1530 0783 02       		.uleb128 0x2
+ 1531 0784 77       		.byte	0x77
+ 1532 0785 00       		.sleb128 0
+ 1533 0786 00       		.byte	0
+ 1534 0787 19       		.uleb128 0x19
+ 1535 0788 08010000 		.4byte	.LVL30
+ 1536 078c EC080000 		.4byte	0x8ec
+ 1537 0790 A0070000 		.4byte	0x7a0
+ 1538 0794 1A       		.uleb128 0x1a
+ 1539 0795 01       		.uleb128 0x1
+ 1540 0796 52       		.byte	0x52
+ 1541 0797 01       		.uleb128 0x1
+ 1542 0798 36       		.byte	0x36
+ 1543 0799 1A       		.uleb128 0x1a
+ 1544 079a 01       		.uleb128 0x1
+ 1545 079b 50       		.byte	0x50
+ 1546 079c 02       		.uleb128 0x2
+ 1547 079d 76       		.byte	0x76
+ 1548 079e 00       		.sleb128 0
+ 1549 079f 00       		.byte	0
+ 1550 07a0 1E       		.uleb128 0x1e
+ 1551 07a1 30010000 		.4byte	.LVL32
+ 1552 07a5 9F050000 		.4byte	0x59f
+ 1553 07a9 19       		.uleb128 0x19
+ 1554 07aa 56010000 		.4byte	.LVL33
+ 1555 07ae CF080000 		.4byte	0x8cf
+ 1556 07b2 C2070000 		.4byte	0x7c2
+ 1557 07b6 1A       		.uleb128 0x1a
+ 1558 07b7 01       		.uleb128 0x1
+ 1559 07b8 52       		.byte	0x52
+ 1560 07b9 01       		.uleb128 0x1
+ 1561 07ba 44       		.byte	0x44
+ 1562 07bb 1A       		.uleb128 0x1a
+ 1563 07bc 01       		.uleb128 0x1
+ 1564 07bd 50       		.byte	0x50
+ 1565 07be 02       		.uleb128 0x2
+ 1566 07bf 74       		.byte	0x74
+ 1567 07c0 00       		.sleb128 0
+ 1568 07c1 00       		.byte	0
+ 1569 07c2 19       		.uleb128 0x19
+ 1570 07c3 60010000 		.4byte	.LVL34
+ 1571 07c7 EC080000 		.4byte	0x8ec
+ 1572 07cb E4070000 		.4byte	0x7e4
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 37
+
+
+ 1573 07cf 1A       		.uleb128 0x1a
+ 1574 07d0 01       		.uleb128 0x1
+ 1575 07d1 52       		.byte	0x52
+ 1576 07d2 01       		.uleb128 0x1
+ 1577 07d3 35       		.byte	0x35
+ 1578 07d4 1A       		.uleb128 0x1a
+ 1579 07d5 01       		.uleb128 0x1
+ 1580 07d6 51       		.byte	0x51
+ 1581 07d7 05       		.uleb128 0x5
+ 1582 07d8 03       		.byte	0x3
+ 1583 07d9 00000000 		.4byte	.LC4
+ 1584 07dd 1A       		.uleb128 0x1a
+ 1585 07de 01       		.uleb128 0x1
+ 1586 07df 50       		.byte	0x50
+ 1587 07e0 02       		.uleb128 0x2
+ 1588 07e1 74       		.byte	0x74
+ 1589 07e2 00       		.sleb128 0
+ 1590 07e3 00       		.byte	0
+ 1591 07e4 19       		.uleb128 0x19
+ 1592 07e5 72010000 		.4byte	.LVL35
+ 1593 07e9 10090000 		.4byte	0x910
+ 1594 07ed 0C080000 		.4byte	0x80c
+ 1595 07f1 1A       		.uleb128 0x1a
+ 1596 07f2 01       		.uleb128 0x1
+ 1597 07f3 52       		.byte	0x52
+ 1598 07f4 01       		.uleb128 0x1
+ 1599 07f5 3A       		.byte	0x3a
+ 1600 07f6 1A       		.uleb128 0x1a
+ 1601 07f7 01       		.uleb128 0x1
+ 1602 07f8 51       		.byte	0x51
+ 1603 07f9 05       		.uleb128 0x5
+ 1604 07fa 03       		.byte	0x3
+ 1605 07fb 05000000 		.4byte	.LC6
+ 1606 07ff 1A       		.uleb128 0x1a
+ 1607 0800 01       		.uleb128 0x1
+ 1608 0801 50       		.byte	0x50
+ 1609 0802 08       		.uleb128 0x8
+ 1610 0803 76       		.byte	0x76
+ 1611 0804 00       		.sleb128 0
+ 1612 0805 03       		.byte	0x3
+ 1613 0806 09000000 		.4byte	DeviceInfo+9
+ 1614 080a 22       		.byte	0x22
+ 1615 080b 00       		.byte	0
+ 1616 080c 1E       		.uleb128 0x1e
+ 1617 080d 7A010000 		.4byte	.LVL36
+ 1618 0811 2F090000 		.4byte	0x92f
+ 1619 0815 1E       		.uleb128 0x1e
+ 1620 0816 84010000 		.4byte	.LVL37
+ 1621 081a 37090000 		.4byte	0x937
+ 1622 081e 00       		.byte	0
+ 1623 081f 08       		.uleb128 0x8
+ 1624 0820 04       		.byte	0x4
+ 1625 0821 69040000 		.4byte	0x469
+ 1626 0825 1F       		.uleb128 0x1f
+ 1627 0826 94050000 		.4byte	.LASF182
+ 1628 082a 01       		.byte	0x1
+ 1629 082b 8D01     		.2byte	0x18d
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 38
+
+
+ 1630 082d 00000000 		.4byte	.LFB39
+ 1631 0831 4C000000 		.4byte	.LFE39-.LFB39
+ 1632 0835 01       		.uleb128 0x1
+ 1633 0836 9C       		.byte	0x9c
+ 1634 0837 81080000 		.4byte	0x881
+ 1635 083b 20       		.uleb128 0x20
+ 1636 083c 6900     		.ascii	"i\000"
+ 1637 083e 01       		.byte	0x1
+ 1638 083f 8F01     		.2byte	0x18f
+ 1639 0841 8C000000 		.4byte	0x8c
+ 1640 0845 19       		.uleb128 0x19
+ 1641 0846 20000000 		.4byte	.LVL38
+ 1642 084a CF080000 		.4byte	0x8cf
+ 1643 084e 66080000 		.4byte	0x866
+ 1644 0852 1A       		.uleb128 0x1a
+ 1645 0853 01       		.uleb128 0x1
+ 1646 0854 52       		.byte	0x52
+ 1647 0855 01       		.uleb128 0x1
+ 1648 0856 36       		.byte	0x36
+ 1649 0857 1A       		.uleb128 0x1a
+ 1650 0858 01       		.uleb128 0x1
+ 1651 0859 51       		.byte	0x51
+ 1652 085a 01       		.uleb128 0x1
+ 1653 085b 30       		.byte	0x30
+ 1654 085c 1A       		.uleb128 0x1a
+ 1655 085d 01       		.uleb128 0x1
+ 1656 085e 50       		.byte	0x50
+ 1657 085f 05       		.uleb128 0x5
+ 1658 0860 74       		.byte	0x74
+ 1659 0861 00       		.sleb128 0
+ 1660 0862 76       		.byte	0x76
+ 1661 0863 00       		.sleb128 0
+ 1662 0864 22       		.byte	0x22
+ 1663 0865 00       		.byte	0
+ 1664 0866 1B       		.uleb128 0x1b
+ 1665 0867 40000000 		.4byte	.LVL39
+ 1666 086b CF080000 		.4byte	0x8cf
+ 1667 086f 1A       		.uleb128 0x1a
+ 1668 0870 01       		.uleb128 0x1
+ 1669 0871 52       		.byte	0x52
+ 1670 0872 01       		.uleb128 0x1
+ 1671 0873 36       		.byte	0x36
+ 1672 0874 1A       		.uleb128 0x1a
+ 1673 0875 01       		.uleb128 0x1
+ 1674 0876 51       		.byte	0x51
+ 1675 0877 01       		.uleb128 0x1
+ 1676 0878 30       		.byte	0x30
+ 1677 0879 1A       		.uleb128 0x1a
+ 1678 087a 01       		.uleb128 0x1
+ 1679 087b 50       		.byte	0x50
+ 1680 087c 02       		.uleb128 0x2
+ 1681 087d 74       		.byte	0x74
+ 1682 087e 00       		.sleb128 0
+ 1683 087f 00       		.byte	0
+ 1684 0880 00       		.byte	0
+ 1685 0881 0E       		.uleb128 0xe
+ 1686 0882 94050000 		.4byte	0x594
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 39
+
+
+ 1687 0886 91080000 		.4byte	0x891
+ 1688 088a 0F       		.uleb128 0xf
+ 1689 088b EC000000 		.4byte	0xec
+ 1690 088f 09       		.byte	0x9
+ 1691 0890 00       		.byte	0
+ 1692 0891 21       		.uleb128 0x21
+ 1693 0892 4E070000 		.4byte	.LASF183
+ 1694 0896 01       		.byte	0x1
+ 1695 0897 15       		.byte	0x15
+ 1696 0898 81080000 		.4byte	0x881
+ 1697 089c 05       		.uleb128 0x5
+ 1698 089d 03       		.byte	0x3
+ 1699 089e 00000000 		.4byte	DeviceInfo
+ 1700 08a2 21       		.uleb128 0x21
+ 1701 08a3 4C0D0000 		.4byte	.LASF184
+ 1702 08a7 01       		.byte	0x1
+ 1703 08a8 17       		.byte	0x17
+ 1704 08a9 8C000000 		.4byte	0x8c
+ 1705 08ad 05       		.uleb128 0x5
+ 1706 08ae 03       		.byte	0x3
+ 1707 08af 00000000 		.4byte	DeviceCount
+ 1708 08b3 21       		.uleb128 0x21
+ 1709 08b4 7A0E0000 		.4byte	.LASF185
+ 1710 08b8 01       		.byte	0x1
+ 1711 08b9 18       		.byte	0x18
+ 1712 08ba 8C000000 		.4byte	0x8c
+ 1713 08be 05       		.uleb128 0x5
+ 1714 08bf 03       		.byte	0x3
+ 1715 08c0 00000000 		.4byte	flag
+ 1716 08c4 22       		.uleb128 0x22
+ 1717 08c5 C3090000 		.4byte	.LASF186
+ 1718 08c9 01       		.byte	0x1
+ 1719 08ca 1A       		.byte	0x1a
+ 1720 08cb 8C000000 		.4byte	0x8c
+ 1721 08cf 23       		.uleb128 0x23
+ 1722 08d0 B0110000 		.4byte	.LASF187
+ 1723 08d4 F3000000 		.4byte	0xf3
+ 1724 08d8 EC080000 		.4byte	0x8ec
+ 1725 08dc 24       		.uleb128 0x24
+ 1726 08dd F3000000 		.4byte	0xf3
+ 1727 08e1 24       		.uleb128 0x24
+ 1728 08e2 73000000 		.4byte	0x73
+ 1729 08e6 24       		.uleb128 0x24
+ 1730 08e7 EC000000 		.4byte	0xec
+ 1731 08eb 00       		.byte	0
+ 1732 08ec 23       		.uleb128 0x23
+ 1733 08ed C4100000 		.4byte	.LASF188
+ 1734 08f1 F3000000 		.4byte	0xf3
+ 1735 08f5 09090000 		.4byte	0x909
+ 1736 08f9 24       		.uleb128 0x24
+ 1737 08fa F3000000 		.4byte	0xf3
+ 1738 08fe 24       		.uleb128 0x24
+ 1739 08ff 09090000 		.4byte	0x909
+ 1740 0903 24       		.uleb128 0x24
+ 1741 0904 EC000000 		.4byte	0xec
+ 1742 0908 00       		.byte	0
+ 1743 0909 08       		.uleb128 0x8
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 40
+
+
+ 1744 090a 04       		.byte	0x4
+ 1745 090b 0F090000 		.4byte	0x90f
+ 1746 090f 25       		.uleb128 0x25
+ 1747 0910 26       		.uleb128 0x26
+ 1748 0911 2A0E0000 		.4byte	.LASF193
+ 1749 0915 0A       		.byte	0xa
+ 1750 0916 23       		.byte	0x23
+ 1751 0917 73000000 		.4byte	0x73
+ 1752 091b 2F090000 		.4byte	0x92f
+ 1753 091f 24       		.uleb128 0x24
+ 1754 0920 F5000000 		.4byte	0xf5
+ 1755 0924 24       		.uleb128 0x24
+ 1756 0925 F5000000 		.4byte	0xf5
+ 1757 0929 24       		.uleb128 0x24
+ 1758 092a E1000000 		.4byte	0xe1
+ 1759 092e 00       		.byte	0
+ 1760 092f 27       		.uleb128 0x27
+ 1761 0930 C1080000 		.4byte	.LASF194
+ 1762 0934 08       		.byte	0x8
+ 1763 0935 7002     		.2byte	0x270
+ 1764 0937 28       		.uleb128 0x28
+ 1765 0938 580D0000 		.4byte	.LASF195
+ 1766 093c 0B       		.byte	0xb
+ 1767 093d 8E01     		.2byte	0x18e
+ 1768 093f A3000000 		.4byte	0xa3
+ 1769 0943 29       		.uleb128 0x29
+ 1770 0944 A9130000 		.4byte	.LASF189
+ 1771 0948 0A       		.byte	0xa
+ 1772 0949 16       		.byte	0x16
+ 1773 094a 73000000 		.4byte	0x73
+ 1774 094e 24       		.uleb128 0x24
+ 1775 094f 09090000 		.4byte	0x909
+ 1776 0953 24       		.uleb128 0x24
+ 1777 0954 09090000 		.4byte	0x909
+ 1778 0958 24       		.uleb128 0x24
+ 1779 0959 E1000000 		.4byte	0xe1
+ 1780 095d 00       		.byte	0
+ 1781 095e 00       		.byte	0
+ 1782              		.section	.debug_abbrev,"",%progbits
+ 1783              	.Ldebug_abbrev0:
+ 1784 0000 01       		.uleb128 0x1
+ 1785 0001 11       		.uleb128 0x11
+ 1786 0002 01       		.byte	0x1
+ 1787 0003 25       		.uleb128 0x25
+ 1788 0004 0E       		.uleb128 0xe
+ 1789 0005 13       		.uleb128 0x13
+ 1790 0006 0B       		.uleb128 0xb
+ 1791 0007 03       		.uleb128 0x3
+ 1792 0008 0E       		.uleb128 0xe
+ 1793 0009 1B       		.uleb128 0x1b
+ 1794 000a 0E       		.uleb128 0xe
+ 1795 000b 55       		.uleb128 0x55
+ 1796 000c 17       		.uleb128 0x17
+ 1797 000d 11       		.uleb128 0x11
+ 1798 000e 01       		.uleb128 0x1
+ 1799 000f 10       		.uleb128 0x10
+ 1800 0010 17       		.uleb128 0x17
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 41
+
+
+ 1801 0011 00       		.byte	0
+ 1802 0012 00       		.byte	0
+ 1803 0013 02       		.uleb128 0x2
+ 1804 0014 16       		.uleb128 0x16
+ 1805 0015 00       		.byte	0
+ 1806 0016 03       		.uleb128 0x3
+ 1807 0017 0E       		.uleb128 0xe
+ 1808 0018 3A       		.uleb128 0x3a
+ 1809 0019 0B       		.uleb128 0xb
+ 1810 001a 3B       		.uleb128 0x3b
+ 1811 001b 0B       		.uleb128 0xb
+ 1812 001c 49       		.uleb128 0x49
+ 1813 001d 13       		.uleb128 0x13
+ 1814 001e 00       		.byte	0
+ 1815 001f 00       		.byte	0
+ 1816 0020 03       		.uleb128 0x3
+ 1817 0021 24       		.uleb128 0x24
+ 1818 0022 00       		.byte	0
+ 1819 0023 0B       		.uleb128 0xb
+ 1820 0024 0B       		.uleb128 0xb
+ 1821 0025 3E       		.uleb128 0x3e
+ 1822 0026 0B       		.uleb128 0xb
+ 1823 0027 03       		.uleb128 0x3
+ 1824 0028 0E       		.uleb128 0xe
+ 1825 0029 00       		.byte	0
+ 1826 002a 00       		.byte	0
+ 1827 002b 04       		.uleb128 0x4
+ 1828 002c 24       		.uleb128 0x24
+ 1829 002d 00       		.byte	0
+ 1830 002e 0B       		.uleb128 0xb
+ 1831 002f 0B       		.uleb128 0xb
+ 1832 0030 3E       		.uleb128 0x3e
+ 1833 0031 0B       		.uleb128 0xb
+ 1834 0032 03       		.uleb128 0x3
+ 1835 0033 08       		.uleb128 0x8
+ 1836 0034 00       		.byte	0
+ 1837 0035 00       		.byte	0
+ 1838 0036 05       		.uleb128 0x5
+ 1839 0037 16       		.uleb128 0x16
+ 1840 0038 00       		.byte	0
+ 1841 0039 03       		.uleb128 0x3
+ 1842 003a 0E       		.uleb128 0xe
+ 1843 003b 3A       		.uleb128 0x3a
+ 1844 003c 0B       		.uleb128 0xb
+ 1845 003d 3B       		.uleb128 0x3b
+ 1846 003e 05       		.uleb128 0x5
+ 1847 003f 49       		.uleb128 0x49
+ 1848 0040 13       		.uleb128 0x13
+ 1849 0041 00       		.byte	0
+ 1850 0042 00       		.byte	0
+ 1851 0043 06       		.uleb128 0x6
+ 1852 0044 35       		.uleb128 0x35
+ 1853 0045 00       		.byte	0
+ 1854 0046 49       		.uleb128 0x49
+ 1855 0047 13       		.uleb128 0x13
+ 1856 0048 00       		.byte	0
+ 1857 0049 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 42
+
+
+ 1858 004a 07       		.uleb128 0x7
+ 1859 004b 0F       		.uleb128 0xf
+ 1860 004c 00       		.byte	0
+ 1861 004d 0B       		.uleb128 0xb
+ 1862 004e 0B       		.uleb128 0xb
+ 1863 004f 00       		.byte	0
+ 1864 0050 00       		.byte	0
+ 1865 0051 08       		.uleb128 0x8
+ 1866 0052 0F       		.uleb128 0xf
+ 1867 0053 00       		.byte	0
+ 1868 0054 0B       		.uleb128 0xb
+ 1869 0055 0B       		.uleb128 0xb
+ 1870 0056 49       		.uleb128 0x49
+ 1871 0057 13       		.uleb128 0x13
+ 1872 0058 00       		.byte	0
+ 1873 0059 00       		.byte	0
+ 1874 005a 09       		.uleb128 0x9
+ 1875 005b 26       		.uleb128 0x26
+ 1876 005c 00       		.byte	0
+ 1877 005d 49       		.uleb128 0x49
+ 1878 005e 13       		.uleb128 0x13
+ 1879 005f 00       		.byte	0
+ 1880 0060 00       		.byte	0
+ 1881 0061 0A       		.uleb128 0xa
+ 1882 0062 04       		.uleb128 0x4
+ 1883 0063 01       		.byte	0x1
+ 1884 0064 0B       		.uleb128 0xb
+ 1885 0065 0B       		.uleb128 0xb
+ 1886 0066 3A       		.uleb128 0x3a
+ 1887 0067 0B       		.uleb128 0xb
+ 1888 0068 3B       		.uleb128 0x3b
+ 1889 0069 05       		.uleb128 0x5
+ 1890 006a 01       		.uleb128 0x1
+ 1891 006b 13       		.uleb128 0x13
+ 1892 006c 00       		.byte	0
+ 1893 006d 00       		.byte	0
+ 1894 006e 0B       		.uleb128 0xb
+ 1895 006f 28       		.uleb128 0x28
+ 1896 0070 00       		.byte	0
+ 1897 0071 03       		.uleb128 0x3
+ 1898 0072 0E       		.uleb128 0xe
+ 1899 0073 1C       		.uleb128 0x1c
+ 1900 0074 0D       		.uleb128 0xd
+ 1901 0075 00       		.byte	0
+ 1902 0076 00       		.byte	0
+ 1903 0077 0C       		.uleb128 0xc
+ 1904 0078 13       		.uleb128 0x13
+ 1905 0079 01       		.byte	0x1
+ 1906 007a 0B       		.uleb128 0xb
+ 1907 007b 0B       		.uleb128 0xb
+ 1908 007c 3A       		.uleb128 0x3a
+ 1909 007d 0B       		.uleb128 0xb
+ 1910 007e 3B       		.uleb128 0x3b
+ 1911 007f 05       		.uleb128 0x5
+ 1912 0080 01       		.uleb128 0x1
+ 1913 0081 13       		.uleb128 0x13
+ 1914 0082 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 43
+
+
+ 1915 0083 00       		.byte	0
+ 1916 0084 0D       		.uleb128 0xd
+ 1917 0085 0D       		.uleb128 0xd
+ 1918 0086 00       		.byte	0
+ 1919 0087 03       		.uleb128 0x3
+ 1920 0088 0E       		.uleb128 0xe
+ 1921 0089 3A       		.uleb128 0x3a
+ 1922 008a 0B       		.uleb128 0xb
+ 1923 008b 3B       		.uleb128 0x3b
+ 1924 008c 05       		.uleb128 0x5
+ 1925 008d 49       		.uleb128 0x49
+ 1926 008e 13       		.uleb128 0x13
+ 1927 008f 38       		.uleb128 0x38
+ 1928 0090 0B       		.uleb128 0xb
+ 1929 0091 00       		.byte	0
+ 1930 0092 00       		.byte	0
+ 1931 0093 0E       		.uleb128 0xe
+ 1932 0094 01       		.uleb128 0x1
+ 1933 0095 01       		.byte	0x1
+ 1934 0096 49       		.uleb128 0x49
+ 1935 0097 13       		.uleb128 0x13
+ 1936 0098 01       		.uleb128 0x1
+ 1937 0099 13       		.uleb128 0x13
+ 1938 009a 00       		.byte	0
+ 1939 009b 00       		.byte	0
+ 1940 009c 0F       		.uleb128 0xf
+ 1941 009d 21       		.uleb128 0x21
+ 1942 009e 00       		.byte	0
+ 1943 009f 49       		.uleb128 0x49
+ 1944 00a0 13       		.uleb128 0x13
+ 1945 00a1 2F       		.uleb128 0x2f
+ 1946 00a2 0B       		.uleb128 0xb
+ 1947 00a3 00       		.byte	0
+ 1948 00a4 00       		.byte	0
+ 1949 00a5 10       		.uleb128 0x10
+ 1950 00a6 04       		.uleb128 0x4
+ 1951 00a7 01       		.byte	0x1
+ 1952 00a8 0B       		.uleb128 0xb
+ 1953 00a9 0B       		.uleb128 0xb
+ 1954 00aa 3A       		.uleb128 0x3a
+ 1955 00ab 0B       		.uleb128 0xb
+ 1956 00ac 3B       		.uleb128 0x3b
+ 1957 00ad 0B       		.uleb128 0xb
+ 1958 00ae 01       		.uleb128 0x1
+ 1959 00af 13       		.uleb128 0x13
+ 1960 00b0 00       		.byte	0
+ 1961 00b1 00       		.byte	0
+ 1962 00b2 11       		.uleb128 0x11
+ 1963 00b3 13       		.uleb128 0x13
+ 1964 00b4 01       		.byte	0x1
+ 1965 00b5 0B       		.uleb128 0xb
+ 1966 00b6 0B       		.uleb128 0xb
+ 1967 00b7 3A       		.uleb128 0x3a
+ 1968 00b8 0B       		.uleb128 0xb
+ 1969 00b9 3B       		.uleb128 0x3b
+ 1970 00ba 0B       		.uleb128 0xb
+ 1971 00bb 01       		.uleb128 0x1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 44
+
+
+ 1972 00bc 13       		.uleb128 0x13
+ 1973 00bd 00       		.byte	0
+ 1974 00be 00       		.byte	0
+ 1975 00bf 12       		.uleb128 0x12
+ 1976 00c0 0D       		.uleb128 0xd
+ 1977 00c1 00       		.byte	0
+ 1978 00c2 03       		.uleb128 0x3
+ 1979 00c3 0E       		.uleb128 0xe
+ 1980 00c4 3A       		.uleb128 0x3a
+ 1981 00c5 0B       		.uleb128 0xb
+ 1982 00c6 3B       		.uleb128 0x3b
+ 1983 00c7 0B       		.uleb128 0xb
+ 1984 00c8 49       		.uleb128 0x49
+ 1985 00c9 13       		.uleb128 0x13
+ 1986 00ca 38       		.uleb128 0x38
+ 1987 00cb 0B       		.uleb128 0xb
+ 1988 00cc 00       		.byte	0
+ 1989 00cd 00       		.byte	0
+ 1990 00ce 13       		.uleb128 0x13
+ 1991 00cf 0D       		.uleb128 0xd
+ 1992 00d0 00       		.byte	0
+ 1993 00d1 03       		.uleb128 0x3
+ 1994 00d2 08       		.uleb128 0x8
+ 1995 00d3 3A       		.uleb128 0x3a
+ 1996 00d4 0B       		.uleb128 0xb
+ 1997 00d5 3B       		.uleb128 0x3b
+ 1998 00d6 0B       		.uleb128 0xb
+ 1999 00d7 49       		.uleb128 0x49
+ 2000 00d8 13       		.uleb128 0x13
+ 2001 00d9 38       		.uleb128 0x38
+ 2002 00da 0B       		.uleb128 0xb
+ 2003 00db 00       		.byte	0
+ 2004 00dc 00       		.byte	0
+ 2005 00dd 14       		.uleb128 0x14
+ 2006 00de 2E       		.uleb128 0x2e
+ 2007 00df 01       		.byte	0x1
+ 2008 00e0 3F       		.uleb128 0x3f
+ 2009 00e1 19       		.uleb128 0x19
+ 2010 00e2 03       		.uleb128 0x3
+ 2011 00e3 0E       		.uleb128 0xe
+ 2012 00e4 3A       		.uleb128 0x3a
+ 2013 00e5 0B       		.uleb128 0xb
+ 2014 00e6 3B       		.uleb128 0x3b
+ 2015 00e7 0B       		.uleb128 0xb
+ 2016 00e8 27       		.uleb128 0x27
+ 2017 00e9 19       		.uleb128 0x19
+ 2018 00ea 11       		.uleb128 0x11
+ 2019 00eb 01       		.uleb128 0x1
+ 2020 00ec 12       		.uleb128 0x12
+ 2021 00ed 06       		.uleb128 0x6
+ 2022 00ee 40       		.uleb128 0x40
+ 2023 00ef 18       		.uleb128 0x18
+ 2024 00f0 9742     		.uleb128 0x2117
+ 2025 00f2 19       		.uleb128 0x19
+ 2026 00f3 01       		.uleb128 0x1
+ 2027 00f4 13       		.uleb128 0x13
+ 2028 00f5 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 45
+
+
+ 2029 00f6 00       		.byte	0
+ 2030 00f7 15       		.uleb128 0x15
+ 2031 00f8 05       		.uleb128 0x5
+ 2032 00f9 00       		.byte	0
+ 2033 00fa 03       		.uleb128 0x3
+ 2034 00fb 0E       		.uleb128 0xe
+ 2035 00fc 3A       		.uleb128 0x3a
+ 2036 00fd 0B       		.uleb128 0xb
+ 2037 00fe 3B       		.uleb128 0x3b
+ 2038 00ff 0B       		.uleb128 0xb
+ 2039 0100 49       		.uleb128 0x49
+ 2040 0101 13       		.uleb128 0x13
+ 2041 0102 02       		.uleb128 0x2
+ 2042 0103 17       		.uleb128 0x17
+ 2043 0104 00       		.byte	0
+ 2044 0105 00       		.byte	0
+ 2045 0106 16       		.uleb128 0x16
+ 2046 0107 34       		.uleb128 0x34
+ 2047 0108 00       		.byte	0
+ 2048 0109 03       		.uleb128 0x3
+ 2049 010a 0E       		.uleb128 0xe
+ 2050 010b 3A       		.uleb128 0x3a
+ 2051 010c 0B       		.uleb128 0xb
+ 2052 010d 3B       		.uleb128 0x3b
+ 2053 010e 0B       		.uleb128 0xb
+ 2054 010f 49       		.uleb128 0x49
+ 2055 0110 13       		.uleb128 0x13
+ 2056 0111 02       		.uleb128 0x2
+ 2057 0112 17       		.uleb128 0x17
+ 2058 0113 00       		.byte	0
+ 2059 0114 00       		.byte	0
+ 2060 0115 17       		.uleb128 0x17
+ 2061 0116 34       		.uleb128 0x34
+ 2062 0117 00       		.byte	0
+ 2063 0118 03       		.uleb128 0x3
+ 2064 0119 08       		.uleb128 0x8
+ 2065 011a 3A       		.uleb128 0x3a
+ 2066 011b 0B       		.uleb128 0xb
+ 2067 011c 3B       		.uleb128 0x3b
+ 2068 011d 0B       		.uleb128 0xb
+ 2069 011e 49       		.uleb128 0x49
+ 2070 011f 13       		.uleb128 0x13
+ 2071 0120 00       		.byte	0
+ 2072 0121 00       		.byte	0
+ 2073 0122 18       		.uleb128 0x18
+ 2074 0123 34       		.uleb128 0x34
+ 2075 0124 00       		.byte	0
+ 2076 0125 03       		.uleb128 0x3
+ 2077 0126 0E       		.uleb128 0xe
+ 2078 0127 3A       		.uleb128 0x3a
+ 2079 0128 0B       		.uleb128 0xb
+ 2080 0129 3B       		.uleb128 0x3b
+ 2081 012a 0B       		.uleb128 0xb
+ 2082 012b 49       		.uleb128 0x49
+ 2083 012c 13       		.uleb128 0x13
+ 2084 012d 00       		.byte	0
+ 2085 012e 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 46
+
+
+ 2086 012f 19       		.uleb128 0x19
+ 2087 0130 898201   		.uleb128 0x4109
+ 2088 0133 01       		.byte	0x1
+ 2089 0134 11       		.uleb128 0x11
+ 2090 0135 01       		.uleb128 0x1
+ 2091 0136 31       		.uleb128 0x31
+ 2092 0137 13       		.uleb128 0x13
+ 2093 0138 01       		.uleb128 0x1
+ 2094 0139 13       		.uleb128 0x13
+ 2095 013a 00       		.byte	0
+ 2096 013b 00       		.byte	0
+ 2097 013c 1A       		.uleb128 0x1a
+ 2098 013d 8A8201   		.uleb128 0x410a
+ 2099 0140 00       		.byte	0
+ 2100 0141 02       		.uleb128 0x2
+ 2101 0142 18       		.uleb128 0x18
+ 2102 0143 9142     		.uleb128 0x2111
+ 2103 0145 18       		.uleb128 0x18
+ 2104 0146 00       		.byte	0
+ 2105 0147 00       		.byte	0
+ 2106 0148 1B       		.uleb128 0x1b
+ 2107 0149 898201   		.uleb128 0x4109
+ 2108 014c 01       		.byte	0x1
+ 2109 014d 11       		.uleb128 0x11
+ 2110 014e 01       		.uleb128 0x1
+ 2111 014f 31       		.uleb128 0x31
+ 2112 0150 13       		.uleb128 0x13
+ 2113 0151 00       		.byte	0
+ 2114 0152 00       		.byte	0
+ 2115 0153 1C       		.uleb128 0x1c
+ 2116 0154 34       		.uleb128 0x34
+ 2117 0155 00       		.byte	0
+ 2118 0156 03       		.uleb128 0x3
+ 2119 0157 08       		.uleb128 0x8
+ 2120 0158 3A       		.uleb128 0x3a
+ 2121 0159 0B       		.uleb128 0xb
+ 2122 015a 3B       		.uleb128 0x3b
+ 2123 015b 0B       		.uleb128 0xb
+ 2124 015c 49       		.uleb128 0x49
+ 2125 015d 13       		.uleb128 0x13
+ 2126 015e 02       		.uleb128 0x2
+ 2127 015f 17       		.uleb128 0x17
+ 2128 0160 00       		.byte	0
+ 2129 0161 00       		.byte	0
+ 2130 0162 1D       		.uleb128 0x1d
+ 2131 0163 34       		.uleb128 0x34
+ 2132 0164 00       		.byte	0
+ 2133 0165 03       		.uleb128 0x3
+ 2134 0166 0E       		.uleb128 0xe
+ 2135 0167 3A       		.uleb128 0x3a
+ 2136 0168 0B       		.uleb128 0xb
+ 2137 0169 3B       		.uleb128 0x3b
+ 2138 016a 0B       		.uleb128 0xb
+ 2139 016b 49       		.uleb128 0x49
+ 2140 016c 13       		.uleb128 0x13
+ 2141 016d 1C       		.uleb128 0x1c
+ 2142 016e 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 47
+
+
+ 2143 016f 00       		.byte	0
+ 2144 0170 00       		.byte	0
+ 2145 0171 1E       		.uleb128 0x1e
+ 2146 0172 898201   		.uleb128 0x4109
+ 2147 0175 00       		.byte	0
+ 2148 0176 11       		.uleb128 0x11
+ 2149 0177 01       		.uleb128 0x1
+ 2150 0178 31       		.uleb128 0x31
+ 2151 0179 13       		.uleb128 0x13
+ 2152 017a 00       		.byte	0
+ 2153 017b 00       		.byte	0
+ 2154 017c 1F       		.uleb128 0x1f
+ 2155 017d 2E       		.uleb128 0x2e
+ 2156 017e 01       		.byte	0x1
+ 2157 017f 3F       		.uleb128 0x3f
+ 2158 0180 19       		.uleb128 0x19
+ 2159 0181 03       		.uleb128 0x3
+ 2160 0182 0E       		.uleb128 0xe
+ 2161 0183 3A       		.uleb128 0x3a
+ 2162 0184 0B       		.uleb128 0xb
+ 2163 0185 3B       		.uleb128 0x3b
+ 2164 0186 05       		.uleb128 0x5
+ 2165 0187 27       		.uleb128 0x27
+ 2166 0188 19       		.uleb128 0x19
+ 2167 0189 11       		.uleb128 0x11
+ 2168 018a 01       		.uleb128 0x1
+ 2169 018b 12       		.uleb128 0x12
+ 2170 018c 06       		.uleb128 0x6
+ 2171 018d 40       		.uleb128 0x40
+ 2172 018e 18       		.uleb128 0x18
+ 2173 018f 9742     		.uleb128 0x2117
+ 2174 0191 19       		.uleb128 0x19
+ 2175 0192 01       		.uleb128 0x1
+ 2176 0193 13       		.uleb128 0x13
+ 2177 0194 00       		.byte	0
+ 2178 0195 00       		.byte	0
+ 2179 0196 20       		.uleb128 0x20
+ 2180 0197 34       		.uleb128 0x34
+ 2181 0198 00       		.byte	0
+ 2182 0199 03       		.uleb128 0x3
+ 2183 019a 08       		.uleb128 0x8
+ 2184 019b 3A       		.uleb128 0x3a
+ 2185 019c 0B       		.uleb128 0xb
+ 2186 019d 3B       		.uleb128 0x3b
+ 2187 019e 05       		.uleb128 0x5
+ 2188 019f 49       		.uleb128 0x49
+ 2189 01a0 13       		.uleb128 0x13
+ 2190 01a1 00       		.byte	0
+ 2191 01a2 00       		.byte	0
+ 2192 01a3 21       		.uleb128 0x21
+ 2193 01a4 34       		.uleb128 0x34
+ 2194 01a5 00       		.byte	0
+ 2195 01a6 03       		.uleb128 0x3
+ 2196 01a7 0E       		.uleb128 0xe
+ 2197 01a8 3A       		.uleb128 0x3a
+ 2198 01a9 0B       		.uleb128 0xb
+ 2199 01aa 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 48
+
+
+ 2200 01ab 0B       		.uleb128 0xb
+ 2201 01ac 49       		.uleb128 0x49
+ 2202 01ad 13       		.uleb128 0x13
+ 2203 01ae 3F       		.uleb128 0x3f
+ 2204 01af 19       		.uleb128 0x19
+ 2205 01b0 02       		.uleb128 0x2
+ 2206 01b1 18       		.uleb128 0x18
+ 2207 01b2 00       		.byte	0
+ 2208 01b3 00       		.byte	0
+ 2209 01b4 22       		.uleb128 0x22
+ 2210 01b5 34       		.uleb128 0x34
+ 2211 01b6 00       		.byte	0
+ 2212 01b7 03       		.uleb128 0x3
+ 2213 01b8 0E       		.uleb128 0xe
+ 2214 01b9 3A       		.uleb128 0x3a
+ 2215 01ba 0B       		.uleb128 0xb
+ 2216 01bb 3B       		.uleb128 0x3b
+ 2217 01bc 0B       		.uleb128 0xb
+ 2218 01bd 49       		.uleb128 0x49
+ 2219 01be 13       		.uleb128 0x13
+ 2220 01bf 3F       		.uleb128 0x3f
+ 2221 01c0 19       		.uleb128 0x19
+ 2222 01c1 3C       		.uleb128 0x3c
+ 2223 01c2 19       		.uleb128 0x19
+ 2224 01c3 00       		.byte	0
+ 2225 01c4 00       		.byte	0
+ 2226 01c5 23       		.uleb128 0x23
+ 2227 01c6 2E       		.uleb128 0x2e
+ 2228 01c7 01       		.byte	0x1
+ 2229 01c8 3F       		.uleb128 0x3f
+ 2230 01c9 19       		.uleb128 0x19
+ 2231 01ca 03       		.uleb128 0x3
+ 2232 01cb 0E       		.uleb128 0xe
+ 2233 01cc 27       		.uleb128 0x27
+ 2234 01cd 19       		.uleb128 0x19
+ 2235 01ce 49       		.uleb128 0x49
+ 2236 01cf 13       		.uleb128 0x13
+ 2237 01d0 34       		.uleb128 0x34
+ 2238 01d1 19       		.uleb128 0x19
+ 2239 01d2 3C       		.uleb128 0x3c
+ 2240 01d3 19       		.uleb128 0x19
+ 2241 01d4 01       		.uleb128 0x1
+ 2242 01d5 13       		.uleb128 0x13
+ 2243 01d6 00       		.byte	0
+ 2244 01d7 00       		.byte	0
+ 2245 01d8 24       		.uleb128 0x24
+ 2246 01d9 05       		.uleb128 0x5
+ 2247 01da 00       		.byte	0
+ 2248 01db 49       		.uleb128 0x49
+ 2249 01dc 13       		.uleb128 0x13
+ 2250 01dd 00       		.byte	0
+ 2251 01de 00       		.byte	0
+ 2252 01df 25       		.uleb128 0x25
+ 2253 01e0 26       		.uleb128 0x26
+ 2254 01e1 00       		.byte	0
+ 2255 01e2 00       		.byte	0
+ 2256 01e3 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 49
+
+
+ 2257 01e4 26       		.uleb128 0x26
+ 2258 01e5 2E       		.uleb128 0x2e
+ 2259 01e6 01       		.byte	0x1
+ 2260 01e7 3F       		.uleb128 0x3f
+ 2261 01e8 19       		.uleb128 0x19
+ 2262 01e9 03       		.uleb128 0x3
+ 2263 01ea 0E       		.uleb128 0xe
+ 2264 01eb 3A       		.uleb128 0x3a
+ 2265 01ec 0B       		.uleb128 0xb
+ 2266 01ed 3B       		.uleb128 0x3b
+ 2267 01ee 0B       		.uleb128 0xb
+ 2268 01ef 27       		.uleb128 0x27
+ 2269 01f0 19       		.uleb128 0x19
+ 2270 01f1 49       		.uleb128 0x49
+ 2271 01f2 13       		.uleb128 0x13
+ 2272 01f3 3C       		.uleb128 0x3c
+ 2273 01f4 19       		.uleb128 0x19
+ 2274 01f5 01       		.uleb128 0x1
+ 2275 01f6 13       		.uleb128 0x13
+ 2276 01f7 00       		.byte	0
+ 2277 01f8 00       		.byte	0
+ 2278 01f9 27       		.uleb128 0x27
+ 2279 01fa 2E       		.uleb128 0x2e
+ 2280 01fb 00       		.byte	0
+ 2281 01fc 3F       		.uleb128 0x3f
+ 2282 01fd 19       		.uleb128 0x19
+ 2283 01fe 03       		.uleb128 0x3
+ 2284 01ff 0E       		.uleb128 0xe
+ 2285 0200 3A       		.uleb128 0x3a
+ 2286 0201 0B       		.uleb128 0xb
+ 2287 0202 3B       		.uleb128 0x3b
+ 2288 0203 05       		.uleb128 0x5
+ 2289 0204 27       		.uleb128 0x27
+ 2290 0205 19       		.uleb128 0x19
+ 2291 0206 3C       		.uleb128 0x3c
+ 2292 0207 19       		.uleb128 0x19
+ 2293 0208 00       		.byte	0
+ 2294 0209 00       		.byte	0
+ 2295 020a 28       		.uleb128 0x28
+ 2296 020b 2E       		.uleb128 0x2e
+ 2297 020c 00       		.byte	0
+ 2298 020d 3F       		.uleb128 0x3f
+ 2299 020e 19       		.uleb128 0x19
+ 2300 020f 03       		.uleb128 0x3
+ 2301 0210 0E       		.uleb128 0xe
+ 2302 0211 3A       		.uleb128 0x3a
+ 2303 0212 0B       		.uleb128 0xb
+ 2304 0213 3B       		.uleb128 0x3b
+ 2305 0214 05       		.uleb128 0x5
+ 2306 0215 27       		.uleb128 0x27
+ 2307 0216 19       		.uleb128 0x19
+ 2308 0217 49       		.uleb128 0x49
+ 2309 0218 13       		.uleb128 0x13
+ 2310 0219 3C       		.uleb128 0x3c
+ 2311 021a 19       		.uleb128 0x19
+ 2312 021b 00       		.byte	0
+ 2313 021c 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 50
+
+
+ 2314 021d 29       		.uleb128 0x29
+ 2315 021e 2E       		.uleb128 0x2e
+ 2316 021f 01       		.byte	0x1
+ 2317 0220 3F       		.uleb128 0x3f
+ 2318 0221 19       		.uleb128 0x19
+ 2319 0222 03       		.uleb128 0x3
+ 2320 0223 0E       		.uleb128 0xe
+ 2321 0224 3A       		.uleb128 0x3a
+ 2322 0225 0B       		.uleb128 0xb
+ 2323 0226 3B       		.uleb128 0x3b
+ 2324 0227 0B       		.uleb128 0xb
+ 2325 0228 27       		.uleb128 0x27
+ 2326 0229 19       		.uleb128 0x19
+ 2327 022a 49       		.uleb128 0x49
+ 2328 022b 13       		.uleb128 0x13
+ 2329 022c 3C       		.uleb128 0x3c
+ 2330 022d 19       		.uleb128 0x19
+ 2331 022e 00       		.byte	0
+ 2332 022f 00       		.byte	0
+ 2333 0230 00       		.byte	0
+ 2334              		.section	.debug_loc,"",%progbits
+ 2335              	.Ldebug_loc0:
+ 2336              	.LLST0:
+ 2337 0000 00000000 		.4byte	.LVL0
+ 2338 0004 0A000000 		.4byte	.LVL3
+ 2339 0008 0100     		.2byte	0x1
+ 2340 000a 50       		.byte	0x50
+ 2341 000b 0A000000 		.4byte	.LVL3
+ 2342 000f 92000000 		.4byte	.LVL15
+ 2343 0013 0100     		.2byte	0x1
+ 2344 0015 54       		.byte	0x54
+ 2345 0016 00000000 		.4byte	0
+ 2346 001a 00000000 		.4byte	0
+ 2347              	.LLST1:
+ 2348 001e 00000000 		.4byte	.LVL0
+ 2349 0022 0A000000 		.4byte	.LVL3
+ 2350 0026 0100     		.2byte	0x1
+ 2351 0028 51       		.byte	0x51
+ 2352 0029 0A000000 		.4byte	.LVL3
+ 2353 002d 9C000000 		.4byte	.LFE38
+ 2354 0031 0400     		.2byte	0x4
+ 2355 0033 F3       		.byte	0xf3
+ 2356 0034 01       		.uleb128 0x1
+ 2357 0035 51       		.byte	0x51
+ 2358 0036 9F       		.byte	0x9f
+ 2359 0037 00000000 		.4byte	0
+ 2360 003b 00000000 		.4byte	0
+ 2361              	.LLST2:
+ 2362 003f 06000000 		.4byte	.LVL1
+ 2363 0043 08000000 		.4byte	.LVL2
+ 2364 0047 0100     		.2byte	0x1
+ 2365 0049 53       		.byte	0x53
+ 2366 004a 08000000 		.4byte	.LVL2
+ 2367 004e 9C000000 		.4byte	.LFE38
+ 2368 0052 0200     		.2byte	0x2
+ 2369 0054 91       		.byte	0x91
+ 2370 0055 64       		.sleb128 -28
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 51
+
+
+ 2371 0056 00000000 		.4byte	0
+ 2372 005a 00000000 		.4byte	0
+ 2373              	.LLST3:
+ 2374 005e 06000000 		.4byte	.LVL1
+ 2375 0062 0A000000 		.4byte	.LVL3
+ 2376 0066 0200     		.2byte	0x2
+ 2377 0068 30       		.byte	0x30
+ 2378 0069 9F       		.byte	0x9f
+ 2379 006a 0A000000 		.4byte	.LVL3
+ 2380 006e 28000000 		.4byte	.LVL4
+ 2381 0072 0100     		.2byte	0x1
+ 2382 0074 53       		.byte	0x53
+ 2383 0075 52000000 		.4byte	.LVL7
+ 2384 0079 54000000 		.4byte	.LVL8
+ 2385 007d 0100     		.2byte	0x1
+ 2386 007f 53       		.byte	0x53
+ 2387 0080 86000000 		.4byte	.LVL11
+ 2388 0084 88000000 		.4byte	.LVL12
+ 2389 0088 0100     		.2byte	0x1
+ 2390 008a 53       		.byte	0x53
+ 2391 008b 8E000000 		.4byte	.LVL13
+ 2392 008f 9C000000 		.4byte	.LFE38
+ 2393 0093 0100     		.2byte	0x1
+ 2394 0095 53       		.byte	0x53
+ 2395 0096 00000000 		.4byte	0
+ 2396 009a 00000000 		.4byte	0
+ 2397              	.LLST4:
+ 2398 009e 00000000 		.4byte	.LVL16
+ 2399 00a2 32000000 		.4byte	.LVL17
+ 2400 00a6 0100     		.2byte	0x1
+ 2401 00a8 50       		.byte	0x50
+ 2402 00a9 32000000 		.4byte	.LVL17
+ 2403 00ad 66000000 		.4byte	.LVL21
+ 2404 00b1 0100     		.2byte	0x1
+ 2405 00b3 54       		.byte	0x54
+ 2406 00b4 66000000 		.4byte	.LVL21
+ 2407 00b8 C6000000 		.4byte	.LVL27
+ 2408 00bc 0400     		.2byte	0x4
+ 2409 00be F3       		.byte	0xf3
+ 2410 00bf 01       		.uleb128 0x1
+ 2411 00c0 50       		.byte	0x50
+ 2412 00c1 9F       		.byte	0x9f
+ 2413 00c2 C6000000 		.4byte	.LVL27
+ 2414 00c6 D2000000 		.4byte	.LVL28
+ 2415 00ca 0100     		.2byte	0x1
+ 2416 00cc 50       		.byte	0x50
+ 2417 00cd D2000000 		.4byte	.LVL28
+ 2418 00d1 2C010000 		.4byte	.LVL31
+ 2419 00d5 0100     		.2byte	0x1
+ 2420 00d7 54       		.byte	0x54
+ 2421 00d8 2C010000 		.4byte	.LVL31
+ 2422 00dc AC010000 		.4byte	.LFE37
+ 2423 00e0 0400     		.2byte	0x4
+ 2424 00e2 F3       		.byte	0xf3
+ 2425 00e3 01       		.uleb128 0x1
+ 2426 00e4 50       		.byte	0x50
+ 2427 00e5 9F       		.byte	0x9f
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 52
+
+
+ 2428 00e6 00000000 		.4byte	0
+ 2429 00ea 00000000 		.4byte	0
+ 2430              	.LLST5:
+ 2431 00ee 00000000 		.4byte	.LVL16
+ 2432 00f2 D2000000 		.4byte	.LVL28
+ 2433 00f6 0200     		.2byte	0x2
+ 2434 00f8 30       		.byte	0x30
+ 2435 00f9 9F       		.byte	0x9f
+ 2436 00fa 00000000 		.4byte	0
+ 2437 00fe 00000000 		.4byte	0
+ 2438              		.section	.debug_aranges,"",%progbits
+ 2439 0000 2C000000 		.4byte	0x2c
+ 2440 0004 0200     		.2byte	0x2
+ 2441 0006 00000000 		.4byte	.Ldebug_info0
+ 2442 000a 04       		.byte	0x4
+ 2443 000b 00       		.byte	0
+ 2444 000c 0000     		.2byte	0
+ 2445 000e 0000     		.2byte	0
+ 2446 0010 00000000 		.4byte	.LFB38
+ 2447 0014 9C000000 		.4byte	.LFE38-.LFB38
+ 2448 0018 00000000 		.4byte	.LFB37
+ 2449 001c AC010000 		.4byte	.LFE37-.LFB37
+ 2450 0020 00000000 		.4byte	.LFB39
+ 2451 0024 4C000000 		.4byte	.LFE39-.LFB39
+ 2452 0028 00000000 		.4byte	0
+ 2453 002c 00000000 		.4byte	0
+ 2454              		.section	.debug_ranges,"",%progbits
+ 2455              	.Ldebug_ranges0:
+ 2456 0000 00000000 		.4byte	.LFB38
+ 2457 0004 9C000000 		.4byte	.LFE38
+ 2458 0008 00000000 		.4byte	.LFB37
+ 2459 000c AC010000 		.4byte	.LFE37
+ 2460 0010 00000000 		.4byte	.LFB39
+ 2461 0014 4C000000 		.4byte	.LFE39
+ 2462 0018 00000000 		.4byte	0
+ 2463 001c 00000000 		.4byte	0
+ 2464              		.section	.debug_line,"",%progbits
+ 2465              	.Ldebug_line0:
+ 2466 0000 C9020000 		.section	.debug_str,"MS",%progbits,1
+ 2466      02001802 
+ 2466      00000201 
+ 2466      FB0E0D00 
+ 2466      01010101 
+ 2467              	.LASF82:
+ 2468 0000 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_RX_CREDIT_IND\000"
+ 2468      455F4556 
+ 2468      545F4C32 
+ 2468      4341505F 
+ 2468      43424643 
+ 2469              	.LASF27:
+ 2470 0023 4359424C 		.ascii	"CYBLE_EVT_STACK_BUSY_STATUS\000"
+ 2470      455F4556 
+ 2470      545F5354 
+ 2470      41434B5F 
+ 2470      42555359 
+ 2471              	.LASF166:
+ 2472 003f 4359424C 		.ascii	"CYBLE_GAP_ADV_SRVC_DATA_32UUID\000"
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 53
+
+
+ 2472      455F4741 
+ 2472      505F4144 
+ 2472      565F5352 
+ 2472      56435F44 
+ 2473              	.LASF162:
+ 2474 005e 4359424C 		.ascii	"CYBLE_GAP_ADV_LE_ROLE\000"
+ 2474      455F4741 
+ 2474      505F4144 
+ 2474      565F4C45 
+ 2474      5F524F4C 
+ 2475              	.LASF190:
+ 2476 0074 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 2476      4320342E 
+ 2476      392E3320 
+ 2476      32303135 
+ 2476      30333033 
+ 2477 00a7 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m0 -mthumb -g -O"
+ 2477      20726576 
+ 2477      6973696F 
+ 2477      6E203232 
+ 2477      31323230 
+ 2478 00da 73202D66 		.ascii	"s -ffunction-sections -ffat-lto-objects\000"
+ 2478      66756E63 
+ 2478      74696F6E 
+ 2478      2D736563 
+ 2478      74696F6E 
+ 2479              	.LASF81:
+ 2480 0102 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DATA_READ\000"
+ 2480      455F4556 
+ 2480      545F4C32 
+ 2480      4341505F 
+ 2480      43424643 
+ 2481              	.LASF91:
+ 2482 0121 4359424C 		.ascii	"CYBLE_ERROR_MEMORY_ALLOCATION_FAILED\000"
+ 2482      455F4552 
+ 2482      524F525F 
+ 2482      4D454D4F 
+ 2482      52595F41 
+ 2483              	.LASF128:
+ 2484 0146 4359424C 		.ascii	"CYBLE_GAPC_SCAN_RSP\000"
+ 2484      455F4741 
+ 2484      50435F53 
+ 2484      43414E5F 
+ 2484      52535000 
+ 2485              	.LASF20:
+ 2486 015a 73697A65 		.ascii	"size_t\000"
+ 2486      5F7400
+ 2487              	.LASF39:
+ 2488 0161 4359424C 		.ascii	"CYBLE_EVT_GAP_CONNECTION_UPDATE_COMPLETE\000"
+ 2488      455F4556 
+ 2488      545F4741 
+ 2488      505F434F 
+ 2488      4E4E4543 
+ 2489              	.LASF80:
+ 2490 018a 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DISCONN_CNF\000"
+ 2490      455F4556 
+ 2490      545F4C32 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 54
+
+
+ 2490      4341505F 
+ 2490      43424643 
+ 2491              	.LASF170:
+ 2492 01ab 44657669 		.ascii	"DeviceName\000"
+ 2492      63654E61 
+ 2492      6D6500
+ 2493              	.LASF44:
+ 2494 01b6 4359424C 		.ascii	"CYBLE_EVT_GAP_OOB_GENERATED_NOTIFICATION\000"
+ 2494      455F4556 
+ 2494      545F4741 
+ 2494      505F4F4F 
+ 2494      425F4745 
+ 2495              	.LASF139:
+ 2496 01df 4359424C 		.ascii	"CYBLE_GAP_ADV_COMPL_16UUID\000"
+ 2496      455F4741 
+ 2496      505F4144 
+ 2496      565F434F 
+ 2496      4D504C5F 
+ 2497              	.LASF60:
+ 2498 01fa 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_MULTI_RSP\000"
+ 2498      455F4556 
+ 2498      545F4741 
+ 2498      5454435F 
+ 2498      52454144 
+ 2499              	.LASF1:
+ 2500 0219 5F5F7569 		.ascii	"__uint8_t\000"
+ 2500      6E74385F 
+ 2500      7400
+ 2501              	.LASF77:
+ 2502 0223 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_CONN_IND\000"
+ 2502      455F4556 
+ 2502      545F4C32 
+ 2502      4341505F 
+ 2502      43424643 
+ 2503              	.LASF137:
+ 2504 0241 4359424C 		.ascii	"CYBLE_GAP_ADV_FLAGS\000"
+ 2504      455F4741 
+ 2504      505F4144 
+ 2504      565F464C 
+ 2504      41475300 
+ 2505              	.LASF122:
+ 2506 0255 74797065 		.ascii	"type\000"
+ 2506      00
+ 2507              	.LASF24:
+ 2508 025a 4359424C 		.ascii	"CYBLE_EVT_TIMEOUT\000"
+ 2508      455F4556 
+ 2508      545F5449 
+ 2508      4D454F55 
+ 2508      5400
+ 2509              	.LASF6:
+ 2510 026c 6C6F6E67 		.ascii	"long int\000"
+ 2510      20696E74 
+ 2510      00
+ 2511              	.LASF138:
+ 2512 0275 4359424C 		.ascii	"CYBLE_GAP_ADV_INCOMPL_16UUID\000"
+ 2512      455F4741 
+ 2512      505F4144 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 55
+
+
+ 2512      565F494E 
+ 2512      434F4D50 
+ 2513              	.LASF181:
+ 2514 0292 4150495F 		.ascii	"API_RESULT\000"
+ 2514      52455355 
+ 2514      4C5400
+ 2515              	.LASF101:
+ 2516 029d 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_WRONG_ENCODING\000"
+ 2516      455F4552 
+ 2516      524F525F 
+ 2516      4C324341 
+ 2516      505F5053 
+ 2517              	.LASF92:
+ 2518 02c2 4359424C 		.ascii	"CYBLE_ERROR_INSUFFICIENT_RESOURCES\000"
+ 2518      455F4552 
+ 2518      524F525F 
+ 2518      494E5355 
+ 2518      46464943 
+ 2519              	.LASF26:
+ 2520 02e5 4359424C 		.ascii	"CYBLE_EVT_HCI_STATUS\000"
+ 2520      455F4556 
+ 2520      545F4843 
+ 2520      495F5354 
+ 2520      41545553 
+ 2521              	.LASF40:
+ 2522 02fa 4359424C 		.ascii	"CYBLE_EVT_GAPC_SCAN_START_STOP\000"
+ 2522      455F4556 
+ 2522      545F4741 
+ 2522      50435F53 
+ 2522      43414E5F 
+ 2523              	.LASF85:
+ 2524 0319 4359424C 		.ascii	"CYBLE_EVT_PENDING_FLASH_WRITE\000"
+ 2524      455F4556 
+ 2524      545F5045 
+ 2524      4E44494E 
+ 2524      475F464C 
+ 2525              	.LASF0:
+ 2526 0337 5F5F696E 		.ascii	"__int8_t\000"
+ 2526      74385F74 
+ 2526      00
+ 2527              	.LASF123:
+ 2528 0340 4359424C 		.ascii	"CYBLE_GAP_BD_ADDR_T\000"
+ 2528      455F4741 
+ 2528      505F4244 
+ 2528      5F414444 
+ 2528      525F5400 
+ 2529              	.LASF100:
+ 2530 0354 4359424C 		.ascii	"CYBLE_ERROR_SEC_FAILED\000"
+ 2530      455F4552 
+ 2530      524F525F 
+ 2530      5345435F 
+ 2530      4641494C 
+ 2531              	.LASF38:
+ 2532 036b 4359424C 		.ascii	"CYBLE_EVT_GAP_ENCRYPT_CHANGE\000"
+ 2532      455F4556 
+ 2532      545F4741 
+ 2532      505F454E 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 56
+
+
+ 2532      43525950 
+ 2533              	.LASF42:
+ 2534 0388 4359424C 		.ascii	"CYBLE_EVT_GAP_NUMERIC_COMPARISON_REQUEST\000"
+ 2534      455F4556 
+ 2534      545F4741 
+ 2534      505F4E55 
+ 2534      4D455249 
+ 2535              	.LASF157:
+ 2536 03b1 4359424C 		.ascii	"CYBLE_GAP_ADV_PUBLIC_TARGET_ADDR\000"
+ 2536      455F4741 
+ 2536      505F4144 
+ 2536      565F5055 
+ 2536      424C4943 
+ 2537              	.LASF164:
+ 2538 03d2 4359424C 		.ascii	"CYBLE_GAP_ADV_SMPL_PAIR_RANDOM_R256\000"
+ 2538      455F4741 
+ 2538      505F4144 
+ 2538      565F534D 
+ 2538      504C5F50 
+ 2539              	.LASF8:
+ 2540 03f6 6C6F6E67 		.ascii	"long long int\000"
+ 2540      206C6F6E 
+ 2540      6720696E 
+ 2540      7400
+ 2541              	.LASF2:
+ 2542 0404 7369676E 		.ascii	"signed char\000"
+ 2542      65642063 
+ 2542      68617200 
+ 2543              	.LASF112:
+ 2544 0410 4359424C 		.ascii	"CYBLE_ERROR_UNSUPPORTED_FEATURE_OR_PARAMETER_VALUE\000"
+ 2544      455F4552 
+ 2544      524F525F 
+ 2544      554E5355 
+ 2544      50504F52 
+ 2545              	.LASF23:
+ 2546 0443 4359424C 		.ascii	"CYBLE_EVT_STACK_ON\000"
+ 2546      455F4556 
+ 2546      545F5354 
+ 2546      41434B5F 
+ 2546      4F4E00
+ 2547              	.LASF158:
+ 2548 0456 4359424C 		.ascii	"CYBLE_GAP_ADV_RANDOM_TARGET_ADDR\000"
+ 2548      455F4741 
+ 2548      505F4144 
+ 2548      565F5241 
+ 2548      4E444F4D 
+ 2549              	.LASF108:
+ 2550 0477 4359424C 		.ascii	"CYBLE_ERROR_DEVICE_ALREADY_EXISTS\000"
+ 2550      455F4552 
+ 2550      524F525F 
+ 2550      44455649 
+ 2550      43455F41 
+ 2551              	.LASF95:
+ 2552 0499 4359424C 		.ascii	"CYBLE_ERROR_NO_DEVICE_ENTITY\000"
+ 2552      455F4552 
+ 2552      524F525F 
+ 2552      4E4F5F44 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 57
+
+
+ 2552      45564943 
+ 2553              	.LASF30:
+ 2554 04b6 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_REQ\000"
+ 2554      455F4556 
+ 2554      545F4741 
+ 2554      505F4155 
+ 2554      54485F52 
+ 2555              	.LASF58:
+ 2556 04cd 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_RSP\000"
+ 2556      455F4556 
+ 2556      545F4741 
+ 2556      5454435F 
+ 2556      52454144 
+ 2557              	.LASF119:
+ 2558 04e6 4359424C 		.ascii	"CYBLE_ERROR_INVALID_STATE\000"
+ 2558      455F4552 
+ 2558      524F525F 
+ 2558      494E5641 
+ 2558      4C49445F 
+ 2559              	.LASF63:
+ 2560 0500 4359424C 		.ascii	"CYBLE_EVT_GATTS_WRITE_CMD_REQ\000"
+ 2560      455F4556 
+ 2560      545F4741 
+ 2560      5454535F 
+ 2560      57524954 
+ 2561              	.LASF171:
+ 2562 051e 5363616E 		.ascii	"ScanName\000"
+ 2562      4E616D65 
+ 2562      00
+ 2563              	.LASF71:
+ 2564 0527 4359424C 		.ascii	"CYBLE_EVT_GATTC_STOP_CMD_COMPLETE\000"
+ 2564      455F4556 
+ 2564      545F4741 
+ 2564      5454435F 
+ 2564      53544F50 
+ 2565              	.LASF35:
+ 2566 0549 4359424C 		.ascii	"CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP\000"
+ 2566      455F4556 
+ 2566      545F4741 
+ 2566      50505F41 
+ 2566      44564552 
+ 2567              	.LASF106:
+ 2568 0571 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_NOT_IN_RANGE\000"
+ 2568      455F4552 
+ 2568      524F525F 
+ 2568      4C324341 
+ 2568      505F5053 
+ 2569              	.LASF182:
+ 2570 0594 5363616E 		.ascii	"ScanDeviceInfoInit\000"
+ 2570      44657669 
+ 2570      6365496E 
+ 2570      666F496E 
+ 2570      697400
+ 2571              	.LASF13:
+ 2572 05a7 75696E74 		.ascii	"uint8\000"
+ 2572      3800
+ 2573              	.LASF132:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 58
+
+
+ 2574 05ad 70656572 		.ascii	"peerBdAddr\000"
+ 2574      42644164 
+ 2574      647200
+ 2575              	.LASF66:
+ 2576 05b8 4359424C 		.ascii	"CYBLE_EVT_GATTC_EXEC_WRITE_RSP\000"
+ 2576      455F4556 
+ 2576      545F4741 
+ 2576      5454435F 
+ 2576      45584543 
+ 2577              	.LASF17:
+ 2578 05d7 646F7562 		.ascii	"double\000"
+ 2578      6C6500
+ 2579              	.LASF89:
+ 2580 05de 4359424C 		.ascii	"CYBLE_ERROR_INVALID_PARAMETER\000"
+ 2580      455F4552 
+ 2580      524F525F 
+ 2580      494E5641 
+ 2580      4C49445F 
+ 2581              	.LASF14:
+ 2582 05fc 75696E74 		.ascii	"uint32\000"
+ 2582      333200
+ 2583              	.LASF141:
+ 2584 0603 4359424C 		.ascii	"CYBLE_GAP_ADV_COMPL_32_UUID\000"
+ 2584      455F4741 
+ 2584      505F4144 
+ 2584      565F434F 
+ 2584      4D504C5F 
+ 2585              	.LASF87:
+ 2586 061f 4359424C 		.ascii	"CYBLE_EVT_MAX\000"
+ 2586      455F4556 
+ 2586      545F4D41 
+ 2586      5800
+ 2587              	.LASF88:
+ 2588 062d 4359424C 		.ascii	"CYBLE_ERROR_OK\000"
+ 2588      455F4552 
+ 2588      524F525F 
+ 2588      4F4B00
+ 2589              	.LASF49:
+ 2590 063c 4359424C 		.ascii	"CYBLE_EVT_GATTC_ERROR_RSP\000"
+ 2590      455F4556 
+ 2590      545F4741 
+ 2590      5454435F 
+ 2590      4552524F 
+ 2591              	.LASF178:
+ 2592 0656 50617273 		.ascii	"Parser_adv_data_scan_data\000"
+ 2592      65725F61 
+ 2592      64765F64 
+ 2592      6174615F 
+ 2592      7363616E 
+ 2593              	.LASF163:
+ 2594 0670 4359424C 		.ascii	"CYBLE_GAP_ADV_SMPL_PAIR_HASH_C256\000"
+ 2594      455F4741 
+ 2594      505F4144 
+ 2594      565F534D 
+ 2594      504C5F50 
+ 2595              	.LASF133:
+ 2596 0692 64617461 		.ascii	"dataLen\000"
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 59
+
+
+ 2596      4C656E00 
+ 2597              	.LASF84:
+ 2598 069a 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DATA_WRITE_IND\000"
+ 2598      455F4556 
+ 2598      545F4C32 
+ 2598      4341505F 
+ 2598      43424643 
+ 2599              	.LASF9:
+ 2600 06be 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2600      206C6F6E 
+ 2600      6720756E 
+ 2600      7369676E 
+ 2600      65642069 
+ 2601              	.LASF125:
+ 2602 06d5 4359424C 		.ascii	"CYBLE_GAPC_CONN_DIRECTED_ADV\000"
+ 2602      455F4741 
+ 2602      50435F43 
+ 2602      4F4E4E5F 
+ 2602      44495245 
+ 2603              	.LASF142:
+ 2604 06f2 4359424C 		.ascii	"CYBLE_GAP_ADV_INCOMPL_128_UUID\000"
+ 2604      455F4741 
+ 2604      505F4144 
+ 2604      565F494E 
+ 2604      434F4D50 
+ 2605              	.LASF93:
+ 2606 0711 4359424C 		.ascii	"CYBLE_ERROR_OOB_NOT_AVAILABLE\000"
+ 2606      455F4552 
+ 2606      524F525F 
+ 2606      4F4F425F 
+ 2606      4E4F545F 
+ 2607              	.LASF86:
+ 2608 072f 4359424C 		.ascii	"CYBLE_EVT_LE_PING_AUTH_TIMEOUT\000"
+ 2608      455F4556 
+ 2608      545F4C45 
+ 2608      5F50494E 
+ 2608      475F4155 
+ 2609              	.LASF183:
+ 2610 074e 44657669 		.ascii	"DeviceInfo\000"
+ 2610      6365496E 
+ 2610      666F00
+ 2611              	.LASF102:
+ 2612 0759 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_ALREADY_REGISTERED\000"
+ 2612      455F4552 
+ 2612      524F525F 
+ 2612      4C324341 
+ 2612      505F5053 
+ 2613              	.LASF147:
+ 2614 0782 4359424C 		.ascii	"CYBLE_GAP_ADV_CLASS_OF_DEVICE\000"
+ 2614      455F4741 
+ 2614      505F4144 
+ 2614      565F434C 
+ 2614      4153535F 
+ 2615              	.LASF7:
+ 2616 07a0 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2616      20756E73 
+ 2616      69676E65 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 60
+
+
+ 2616      6420696E 
+ 2616      7400
+ 2617              	.LASF61:
+ 2618 07b2 4359424C 		.ascii	"CYBLE_EVT_GATTS_WRITE_REQ\000"
+ 2618      455F4556 
+ 2618      545F4741 
+ 2618      5454535F 
+ 2618      57524954 
+ 2619              	.LASF53:
+ 2620 07cc 4359424C 		.ascii	"CYBLE_EVT_GATTC_XCHNG_MTU_RSP\000"
+ 2620      455F4556 
+ 2620      545F4741 
+ 2620      5454435F 
+ 2620      5843484E 
+ 2621              	.LASF70:
+ 2622 07ea 4359424C 		.ascii	"CYBLE_EVT_GATTS_DATA_SIGNED_CMD_REQ\000"
+ 2622      455F4556 
+ 2622      545F4741 
+ 2622      5454535F 
+ 2622      44415441 
+ 2623              	.LASF73:
+ 2624 080e 4359424C 		.ascii	"CYBLE_EVT_GATTC_LONG_PROCEDURE_END\000"
+ 2624      455F4556 
+ 2624      545F4741 
+ 2624      5454435F 
+ 2624      4C4F4E47 
+ 2625              	.LASF105:
+ 2626 0831 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_CHANNEL_NOT_FOUND\000"
+ 2626      455F4552 
+ 2626      524F525F 
+ 2626      4C324341 
+ 2626      505F4348 
+ 2627              	.LASF134:
+ 2628 0855 64617461 		.ascii	"data\000"
+ 2628      00
+ 2629              	.LASF116:
+ 2630 085a 4359424C 		.ascii	"CYBLE_ERROR_NTF_DISABLED\000"
+ 2630      455F4552 
+ 2630      524F525F 
+ 2630      4E54465F 
+ 2630      44495341 
+ 2631              	.LASF22:
+ 2632 0873 4359424C 		.ascii	"CYBLE_EVT_HOST_INVALID\000"
+ 2632      455F4556 
+ 2632      545F484F 
+ 2632      53545F49 
+ 2632      4E56414C 
+ 2633              	.LASF56:
+ 2634 088a 4359424C 		.ascii	"CYBLE_EVT_GATTC_FIND_INFO_RSP\000"
+ 2634      455F4556 
+ 2634      545F4741 
+ 2634      5454435F 
+ 2634      46494E44 
+ 2635              	.LASF28:
+ 2636 08a8 4359424C 		.ascii	"CYBLE_EVT_MEMORY_REQUEST\000"
+ 2636      455F4556 
+ 2636      545F4D45 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 61
+
+
+ 2636      4D4F5259 
+ 2636      5F524551 
+ 2637              	.LASF194:
+ 2638 08c1 4379426C 		.ascii	"CyBle_GapcStopScan\000"
+ 2638      655F4761 
+ 2638      70635374 
+ 2638      6F705363 
+ 2638      616E00
+ 2639              	.LASF15:
+ 2640 08d4 696E7438 		.ascii	"int8\000"
+ 2640      00
+ 2641              	.LASF65:
+ 2642 08d9 4359424C 		.ascii	"CYBLE_EVT_GATTS_EXEC_WRITE_REQ\000"
+ 2642      455F4556 
+ 2642      545F4741 
+ 2642      5454535F 
+ 2642      45584543 
+ 2643              	.LASF179:
+ 2644 08f8 48616E64 		.ascii	"HandleScanDevices\000"
+ 2644      6C655363 
+ 2644      616E4465 
+ 2644      76696365 
+ 2644      7300
+ 2645              	.LASF31:
+ 2646 090a 4359424C 		.ascii	"CYBLE_EVT_GAP_PASSKEY_ENTRY_REQUEST\000"
+ 2646      455F4556 
+ 2646      545F4741 
+ 2646      505F5041 
+ 2646      53534B45 
+ 2647              	.LASF36:
+ 2648 092e 4359424C 		.ascii	"CYBLE_EVT_GAP_DEVICE_CONNECTED\000"
+ 2648      455F4556 
+ 2648      545F4741 
+ 2648      505F4445 
+ 2648      56494345 
+ 2649              	.LASF167:
+ 2650 094d 4359424C 		.ascii	"CYBLE_GAP_ADV_SRVC_DATA_128UUID\000"
+ 2650      455F4741 
+ 2650      505F4144 
+ 2650      565F5352 
+ 2650      56435F44 
+ 2651              	.LASF155:
+ 2652 096d 4359424C 		.ascii	"CYBLE_GAP_ADV_SOLICIT_128UUID\000"
+ 2652      455F4741 
+ 2652      505F4144 
+ 2652      565F534F 
+ 2652      4C494349 
+ 2653              	.LASF172:
+ 2654 098b 4359424C 		.ascii	"CYBLE_DEVICE_INFO\000"
+ 2654      455F4445 
+ 2654      56494345 
+ 2654      5F494E46 
+ 2654      4F00
+ 2655              	.LASF74:
+ 2656 099d 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CONN_PARAM_UPDATE_REQ\000"
+ 2656      455F4556 
+ 2656      545F4C32 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 62
+
+
+ 2656      4341505F 
+ 2656      434F4E4E 
+ 2657              	.LASF186:
+ 2658 09c3 53544F50 		.ascii	"STOP_SCAN_FLAG\000"
+ 2658      5F534341 
+ 2658      4E5F464C 
+ 2658      414700
+ 2659              	.LASF32:
+ 2660 09d2 4359424C 		.ascii	"CYBLE_EVT_GAP_PASSKEY_DISPLAY_REQUEST\000"
+ 2660      455F4556 
+ 2660      545F4741 
+ 2660      505F5041 
+ 2660      53534B45 
+ 2661              	.LASF50:
+ 2662 09f8 4359424C 		.ascii	"CYBLE_EVT_GATT_CONNECT_IND\000"
+ 2662      455F4556 
+ 2662      545F4741 
+ 2662      54545F43 
+ 2662      4F4E4E45 
+ 2663              	.LASF76:
+ 2664 0a13 4359424C 		.ascii	"CYBLE_EVT_L2CAP_COMMAND_REJ\000"
+ 2664      455F4556 
+ 2664      545F4C32 
+ 2664      4341505F 
+ 2664      434F4D4D 
+ 2665              	.LASF19:
+ 2666 0a2f 72656733 		.ascii	"reg32\000"
+ 2666      3200
+ 2667              	.LASF29:
+ 2668 0a35 4359424C 		.ascii	"CYBLE_EVT_GAPC_SCAN_PROGRESS_RESULT\000"
+ 2668      455F4556 
+ 2668      545F4741 
+ 2668      50435F53 
+ 2668      43414E5F 
+ 2669              	.LASF161:
+ 2670 0a59 4359424C 		.ascii	"CYBLE_GAP_ADV_LE_BT_DEVICE_ADDR\000"
+ 2670      455F4741 
+ 2670      505F4144 
+ 2670      565F4C45 
+ 2670      5F42545F 
+ 2671              	.LASF127:
+ 2672 0a79 4359424C 		.ascii	"CYBLE_GAPC_NON_CONN_UNDIRECTED_ADV\000"
+ 2672      455F4741 
+ 2672      50435F4E 
+ 2672      4F4E5F43 
+ 2672      4F4E4E5F 
+ 2673              	.LASF115:
+ 2674 0a9c 4359424C 		.ascii	"CYBLE_ERROR_MAX\000"
+ 2674      455F4552 
+ 2674      524F525F 
+ 2674      4D415800 
+ 2675              	.LASF117:
+ 2676 0aac 4359424C 		.ascii	"CYBLE_ERROR_IND_DISABLED\000"
+ 2676      455F4552 
+ 2676      524F525F 
+ 2676      494E445F 
+ 2676      44495341 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 63
+
+
+ 2677              	.LASF55:
+ 2678 0ac5 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BY_TYPE_RSP\000"
+ 2678      455F4556 
+ 2678      545F4741 
+ 2678      5454435F 
+ 2678      52454144 
+ 2679              	.LASF21:
+ 2680 0ae6 73697A65 		.ascii	"sizetype\000"
+ 2680      74797065 
+ 2680      00
+ 2681              	.LASF148:
+ 2682 0aef 4359424C 		.ascii	"CYBLE_GAP_ADV_SMPL_PAIR_HASH_C\000"
+ 2682      455F4741 
+ 2682      505F4144 
+ 2682      565F534D 
+ 2682      504C5F50 
+ 2683              	.LASF34:
+ 2684 0b0e 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_FAILED\000"
+ 2684      455F4556 
+ 2684      545F4741 
+ 2684      505F4155 
+ 2684      54485F46 
+ 2685              	.LASF62:
+ 2686 0b28 4359424C 		.ascii	"CYBLE_EVT_GATTC_WRITE_RSP\000"
+ 2686      455F4556 
+ 2686      545F4741 
+ 2686      5454435F 
+ 2686      57524954 
+ 2687              	.LASF47:
+ 2688 0b42 4359424C 		.ascii	"CYBLE_EVT_GAPC_DIRECT_ADV_REPORT\000"
+ 2688      455F4556 
+ 2688      545F4741 
+ 2688      50435F44 
+ 2688      49524543 
+ 2689              	.LASF45:
+ 2690 0b63 4359424C 		.ascii	"CYBLE_EVT_GAP_DATA_LENGTH_CHANGE\000"
+ 2690      455F4556 
+ 2690      545F4741 
+ 2690      505F4441 
+ 2690      54415F4C 
+ 2691              	.LASF160:
+ 2692 0b84 4359424C 		.ascii	"CYBLE_GAP_ADV_ADVERT_INTERVAL\000"
+ 2692      455F4741 
+ 2692      505F4144 
+ 2692      565F4144 
+ 2692      56455254 
+ 2693              	.LASF156:
+ 2694 0ba2 4359424C 		.ascii	"CYBLE_GAP_ADV_SRVC_DATA_16UUID\000"
+ 2694      455F4741 
+ 2694      505F4144 
+ 2694      565F5352 
+ 2694      56435F44 
+ 2695              	.LASF159:
+ 2696 0bc1 4359424C 		.ascii	"CYBLE_GAP_ADV_APPEARANCE\000"
+ 2696      455F4741 
+ 2696      505F4144 
+ 2696      565F4150 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 64
+
+
+ 2696      50454152 
+ 2697              	.LASF168:
+ 2698 0bda 4359424C 		.ascii	"CYBLE_GAP_ADV_3D_INFO_DATA\000"
+ 2698      455F4741 
+ 2698      505F4144 
+ 2698      565F3344 
+ 2698      5F494E46 
+ 2699              	.LASF33:
+ 2700 0bf5 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_COMPLETE\000"
+ 2700      455F4556 
+ 2700      545F4741 
+ 2700      505F4155 
+ 2700      54485F43 
+ 2701              	.LASF149:
+ 2702 0c11 4359424C 		.ascii	"CYBLE_GAP_ADV_SMPL_PAIR_RANDOM_R\000"
+ 2702      455F4741 
+ 2702      505F4144 
+ 2702      565F534D 
+ 2702      504C5F50 
+ 2703              	.LASF175:
+ 2704 0c32 70656E64 		.ascii	"pend\000"
+ 2704      00
+ 2705              	.LASF67:
+ 2706 0c37 4359424C 		.ascii	"CYBLE_EVT_GATTC_HANDLE_VALUE_NTF\000"
+ 2706      455F4556 
+ 2706      545F4741 
+ 2706      5454435F 
+ 2706      48414E44 
+ 2707              	.LASF177:
+ 2708 0c58 53657276 		.ascii	"ServiceCount\000"
+ 2708      69636543 
+ 2708      6F756E74 
+ 2708      00
+ 2709              	.LASF129:
+ 2710 0c65 4359424C 		.ascii	"CYBLE_GAPC_ADV_EVENT_T\000"
+ 2710      455F4741 
+ 2710      50435F41 
+ 2710      44565F45 
+ 2710      56454E54 
+ 2711              	.LASF78:
+ 2712 0c7c 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_CONN_CNF\000"
+ 2712      455F4556 
+ 2712      545F4C32 
+ 2712      4341505F 
+ 2712      43424643 
+ 2713              	.LASF151:
+ 2714 0c9a 4359424C 		.ascii	"CYBLE_GAP_ADV_SCRT_MNGR_TK_VAL\000"
+ 2714      455F4741 
+ 2714      505F4144 
+ 2714      565F5343 
+ 2714      52545F4D 
+ 2715              	.LASF54:
+ 2716 0cb9 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BY_GROUP_TYPE_RSP\000"
+ 2716      455F4556 
+ 2716      545F4741 
+ 2716      5454435F 
+ 2716      52454144 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 65
+
+
+ 2717              	.LASF131:
+ 2718 0ce0 70656572 		.ascii	"peerAddrType\000"
+ 2718      41646472 
+ 2718      54797065 
+ 2718      00
+ 2719              	.LASF16:
+ 2720 0ced 666C6F61 		.ascii	"float\000"
+ 2720      7400
+ 2721              	.LASF152:
+ 2722 0cf3 4359424C 		.ascii	"CYBLE_GAP_ADV_SCRT_MNGR_OOB_FLAGS\000"
+ 2722      455F4741 
+ 2722      505F4144 
+ 2722      565F5343 
+ 2722      52545F4D 
+ 2723              	.LASF146:
+ 2724 0d15 4359424C 		.ascii	"CYBLE_GAP_ADV_TX_PWR_LVL\000"
+ 2724      455F4741 
+ 2724      505F4144 
+ 2724      565F5458 
+ 2724      5F505752 
+ 2725              	.LASF140:
+ 2726 0d2e 4359424C 		.ascii	"CYBLE_GAP_ADV_INCOMPL_32_UUID\000"
+ 2726      455F4741 
+ 2726      505F4144 
+ 2726      565F494E 
+ 2726      434F4D50 
+ 2727              	.LASF184:
+ 2728 0d4c 44657669 		.ascii	"DeviceCount\000"
+ 2728      6365436F 
+ 2728      756E7400 
+ 2729              	.LASF195:
+ 2730 0d58 55415254 		.ascii	"UART_SpiUartGetTxBufferSize\000"
+ 2730      5F537069 
+ 2730      55617274 
+ 2730      47657454 
+ 2730      78427566 
+ 2731              	.LASF150:
+ 2732 0d74 4359424C 		.ascii	"CYBLE_GAP_ADV_DEVICE_ID\000"
+ 2732      455F4741 
+ 2732      505F4144 
+ 2732      565F4445 
+ 2732      56494345 
+ 2733              	.LASF169:
+ 2734 0d8c 44657669 		.ascii	"DeviceList\000"
+ 2734      63654C69 
+ 2734      737400
+ 2735              	.LASF98:
+ 2736 0d97 4359424C 		.ascii	"CYBLE_ERROR_TX_POWER_READ\000"
+ 2736      455F4552 
+ 2736      524F525F 
+ 2736      54585F50 
+ 2736      4F574552 
+ 2737              	.LASF118:
+ 2738 0db1 4359424C 		.ascii	"CYBLE_ERROR_CHAR_IS_NOT_DISCOVERED\000"
+ 2738      455F4552 
+ 2738      524F525F 
+ 2738      43484152 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 66
+
+
+ 2738      5F49535F 
+ 2739              	.LASF144:
+ 2740 0dd4 4359424C 		.ascii	"CYBLE_GAP_ADV_SHORT_NAME\000"
+ 2740      455F4741 
+ 2740      505F4144 
+ 2740      565F5348 
+ 2740      4F52545F 
+ 2741              	.LASF3:
+ 2742 0ded 756E7369 		.ascii	"unsigned char\000"
+ 2742      676E6564 
+ 2742      20636861 
+ 2742      7200
+ 2743              	.LASF43:
+ 2744 0dfb 4359424C 		.ascii	"CYBLE_EVT_GAP_KEYPRESS_NOTIFICATION\000"
+ 2744      455F4556 
+ 2744      545F4741 
+ 2744      505F4B45 
+ 2744      59505245 
+ 2745              	.LASF180:
+ 2746 0e1f 5363616E 		.ascii	"ScanReport\000"
+ 2746      5265706F 
+ 2746      727400
+ 2747              	.LASF193:
+ 2748 0e2a 7374726E 		.ascii	"strncmp\000"
+ 2748      636D7000 
+ 2749              	.LASF4:
+ 2750 0e32 73686F72 		.ascii	"short int\000"
+ 2750      7420696E 
+ 2750      7400
+ 2751              	.LASF68:
+ 2752 0e3c 4359424C 		.ascii	"CYBLE_EVT_GATTC_HANDLE_VALUE_IND\000"
+ 2752      455F4556 
+ 2752      545F4741 
+ 2752      5454435F 
+ 2752      48414E44 
+ 2753              	.LASF154:
+ 2754 0e5d 4359424C 		.ascii	"CYBLE_GAP_ADV_SOLICIT_16UUID\000"
+ 2754      455F4741 
+ 2754      505F4144 
+ 2754      565F534F 
+ 2754      4C494349 
+ 2755              	.LASF185:
+ 2756 0e7a 666C6167 		.ascii	"flag\000"
+ 2756      00
+ 2757              	.LASF94:
+ 2758 0e7f 4359424C 		.ascii	"CYBLE_ERROR_NO_CONNECTION\000"
+ 2758      455F4552 
+ 2758      524F525F 
+ 2758      4E4F5F43 
+ 2758      4F4E4E45 
+ 2759              	.LASF113:
+ 2760 0e99 4359424C 		.ascii	"CYBLE_ERROR_FLASH_WRITE\000"
+ 2760      455F4552 
+ 2760      524F525F 
+ 2760      464C4153 
+ 2760      485F5752 
+ 2761              	.LASF64:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 67
+
+
+ 2762 0eb1 4359424C 		.ascii	"CYBLE_EVT_GATTS_PREP_WRITE_REQ\000"
+ 2762      455F4556 
+ 2762      545F4741 
+ 2762      5454535F 
+ 2762      50524550 
+ 2763              	.LASF165:
+ 2764 0ed0 4359424C 		.ascii	"CYBLE_GAP_ADV_SOLICIT_32UUID\000"
+ 2764      455F4741 
+ 2764      505F4144 
+ 2764      565F534F 
+ 2764      4C494349 
+ 2765              	.LASF111:
+ 2766 0eed 4359424C 		.ascii	"CYBLE_ERROR_HARDWARE_FAILURE\000"
+ 2766      455F4552 
+ 2766      524F525F 
+ 2766      48415244 
+ 2766      57415245 
+ 2767              	.LASF69:
+ 2768 0f0a 4359424C 		.ascii	"CYBLE_EVT_GATTS_HANDLE_VALUE_CNF\000"
+ 2768      455F4556 
+ 2768      545F4741 
+ 2768      5454535F 
+ 2768      48414E44 
+ 2769              	.LASF96:
+ 2770 0f2b 4359424C 		.ascii	"CYBLE_ERROR_REPEATED_ATTEMPTS\000"
+ 2770      455F4552 
+ 2770      524F525F 
+ 2770      52455045 
+ 2770      41544544 
+ 2771              	.LASF48:
+ 2772 0f49 4359424C 		.ascii	"CYBLE_EVT_GAP_SMP_NEGOTIATED_AUTH_INFO\000"
+ 2772      455F4556 
+ 2772      545F4741 
+ 2772      505F534D 
+ 2772      505F4E45 
+ 2773              	.LASF173:
+ 2774 0f70 70646174 		.ascii	"pdata\000"
+ 2774      6100
+ 2775              	.LASF18:
+ 2776 0f76 63686172 		.ascii	"char\000"
+ 2776      00
+ 2777              	.LASF99:
+ 2778 0f7b 4359424C 		.ascii	"CYBLE_ERROR_BT_ON_NOT_COMPLETED\000"
+ 2778      455F4552 
+ 2778      524F525F 
+ 2778      42545F4F 
+ 2778      4E5F4E4F 
+ 2779              	.LASF37:
+ 2780 0f9b 4359424C 		.ascii	"CYBLE_EVT_GAP_DEVICE_DISCONNECTED\000"
+ 2780      455F4556 
+ 2780      545F4741 
+ 2780      505F4445 
+ 2780      56494345 
+ 2781              	.LASF10:
+ 2782 0fbd 756E7369 		.ascii	"unsigned int\000"
+ 2782      676E6564 
+ 2782      20696E74 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 68
+
+
+ 2782      00
+ 2783              	.LASF135:
+ 2784 0fca 72737369 		.ascii	"rssi\000"
+ 2784      00
+ 2785              	.LASF72:
+ 2786 0fcf 4359424C 		.ascii	"CYBLE_EVT_GATTS_READ_CHAR_VAL_ACCESS_REQ\000"
+ 2786      455F4556 
+ 2786      545F4741 
+ 2786      5454535F 
+ 2786      52454144 
+ 2787              	.LASF153:
+ 2788 0ff8 4359424C 		.ascii	"CYBLE_GAP_ADV_SLAVE_CONN_INTRV_RANGE\000"
+ 2788      455F4741 
+ 2788      505F4144 
+ 2788      565F534C 
+ 2788      4156455F 
+ 2789              	.LASF120:
+ 2790 101d 4359424C 		.ascii	"CYBLE_API_RESULT_T\000"
+ 2790      455F4150 
+ 2790      495F5245 
+ 2790      53554C54 
+ 2790      5F5400
+ 2791              	.LASF83:
+ 2792 1030 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_TX_CREDIT_IND\000"
+ 2792      455F4556 
+ 2792      545F4C32 
+ 2792      4341505F 
+ 2792      43424643 
+ 2793              	.LASF59:
+ 2794 1053 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BLOB_RSP\000"
+ 2794      455F4556 
+ 2794      545F4741 
+ 2794      5454435F 
+ 2794      52454144 
+ 2795              	.LASF109:
+ 2796 1071 4359424C 		.ascii	"CYBLE_ERROR_FLASH_WRITE_NOT_PERMITED\000"
+ 2796      455F4552 
+ 2796      524F525F 
+ 2796      464C4153 
+ 2796      485F5752 
+ 2797              	.LASF104:
+ 2798 1096 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_CONNECTION_ENTITY_NOT_FOUND\000"
+ 2798      455F4552 
+ 2798      524F525F 
+ 2798      4C324341 
+ 2798      505F434F 
+ 2799              	.LASF188:
+ 2800 10c4 6D656D63 		.ascii	"memcpy\000"
+ 2800      707900
+ 2801              	.LASF25:
+ 2802 10cb 4359424C 		.ascii	"CYBLE_EVT_HARDWARE_ERROR\000"
+ 2802      455F4556 
+ 2802      545F4841 
+ 2802      52445741 
+ 2802      52455F45 
+ 2803              	.LASF5:
+ 2804 10e4 73686F72 		.ascii	"short unsigned int\000"
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 69
+
+
+ 2804      7420756E 
+ 2804      7369676E 
+ 2804      65642069 
+ 2804      6E7400
+ 2805              	.LASF136:
+ 2806 10f7 4359424C 		.ascii	"CYBLE_GAPC_ADV_REPORT_T\000"
+ 2806      455F4741 
+ 2806      50435F41 
+ 2806      44565F52 
+ 2806      45504F52 
+ 2807              	.LASF176:
+ 2808 110f 6C656E67 		.ascii	"length\000"
+ 2808      746800
+ 2809              	.LASF11:
+ 2810 1116 696E7438 		.ascii	"int8_t\000"
+ 2810      5F7400
+ 2811              	.LASF90:
+ 2812 111d 4359424C 		.ascii	"CYBLE_ERROR_INVALID_OPERATION\000"
+ 2812      455F4552 
+ 2812      524F525F 
+ 2812      494E5641 
+ 2812      4C49445F 
+ 2813              	.LASF52:
+ 2814 113b 4359424C 		.ascii	"CYBLE_EVT_GATTS_XCNHG_MTU_REQ\000"
+ 2814      455F4556 
+ 2814      545F4741 
+ 2814      5454535F 
+ 2814      58434E48 
+ 2815              	.LASF192:
+ 2816 1159 433A5C55 		.ascii	"C:\\Users\\Helon\\Desktop\\Troughpur_Central_Periph"
+ 2816      73657273 
+ 2816      5C48656C 
+ 2816      6F6E5C44 
+ 2816      65736B74 
+ 2817 1188 6572616C 		.ascii	"eral\\Troughput_Central_Peripheral.cydsn\000"
+ 2817      5C54726F 
+ 2817      75676870 
+ 2817      75745F43 
+ 2817      656E7472 
+ 2818              	.LASF187:
+ 2819 11b0 6D656D73 		.ascii	"memset\000"
+ 2819      657400
+ 2820              	.LASF130:
+ 2821 11b7 6576656E 		.ascii	"eventType\000"
+ 2821      74547970 
+ 2821      6500
+ 2822              	.LASF121:
+ 2823 11c1 62644164 		.ascii	"bdAddr\000"
+ 2823      647200
+ 2824              	.LASF126:
+ 2825 11c8 4359424C 		.ascii	"CYBLE_GAPC_SCAN_UNDIRECTED_ADV\000"
+ 2825      455F4741 
+ 2825      50435F53 
+ 2825      43414E5F 
+ 2825      554E4449 
+ 2826              	.LASF12:
+ 2827 11e7 75696E74 		.ascii	"uint8_t\000"
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 70
+
+
+ 2827      385F7400 
+ 2828              	.LASF114:
+ 2829 11ef 4359424C 		.ascii	"CYBLE_ERROR_CONTROLLER_BUSY\000"
+ 2829      455F4552 
+ 2829      524F525F 
+ 2829      434F4E54 
+ 2829      524F4C4C 
+ 2830              	.LASF110:
+ 2831 120b 4359424C 		.ascii	"CYBLE_ERROR_MIC_AUTH_FAILED\000"
+ 2831      455F4552 
+ 2831      524F525F 
+ 2831      4D49435F 
+ 2831      41555448 
+ 2832              	.LASF103:
+ 2833 1227 4359424C 		.ascii	"CYBLE_ERROR_L2CAP_PSM_NOT_REGISTERED\000"
+ 2833      455F4552 
+ 2833      524F525F 
+ 2833      4C324341 
+ 2833      505F5053 
+ 2834              	.LASF145:
+ 2835 124c 4359424C 		.ascii	"CYBLE_GAP_ADV_COMPL_NAME\000"
+ 2835      455F4741 
+ 2835      505F4144 
+ 2835      565F434F 
+ 2835      4D504C5F 
+ 2836              	.LASF57:
+ 2837 1265 4359424C 		.ascii	"CYBLE_EVT_GATTC_FIND_BY_TYPE_VALUE_RSP\000"
+ 2837      455F4556 
+ 2837      545F4741 
+ 2837      5454435F 
+ 2837      46494E44 
+ 2838              	.LASF97:
+ 2839 128c 4359424C 		.ascii	"CYBLE_ERROR_GAP_ROLE\000"
+ 2839      455F4552 
+ 2839      524F525F 
+ 2839      4741505F 
+ 2839      524F4C45 
+ 2840              	.LASF41:
+ 2841 12a1 4359424C 		.ascii	"CYBLE_EVT_GAP_KEYINFO_EXCHNGE_CMPLT\000"
+ 2841      455F4556 
+ 2841      545F4741 
+ 2841      505F4B45 
+ 2841      59494E46 
+ 2842              	.LASF191:
+ 2843 12c5 424C4543 		.ascii	"BLEClient.c\000"
+ 2843      6C69656E 
+ 2843      742E6300 
+ 2844              	.LASF79:
+ 2845 12d1 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DISCONN_IND\000"
+ 2845      455F4556 
+ 2845      545F4C32 
+ 2845      4341505F 
+ 2845      43424643 
+ 2846              	.LASF75:
+ 2847 12f2 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CONN_PARAM_UPDATE_RSP\000"
+ 2847      455F4556 
+ 2847      545F4C32 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\ccHv3m3M.s 			page 71
+
+
+ 2847      4341505F 
+ 2847      434F4E4E 
+ 2848              	.LASF46:
+ 2849 1318 4359424C 		.ascii	"CYBLE_EVT_GAP_ENHANCE_CONN_COMPLETE\000"
+ 2849      455F4556 
+ 2849      545F4741 
+ 2849      505F454E 
+ 2849      48414E43 
+ 2850              	.LASF143:
+ 2851 133c 4359424C 		.ascii	"CYBLE_GAP_ADV_COMPL_128_UUID\000"
+ 2851      455F4741 
+ 2851      505F4144 
+ 2851      565F434F 
+ 2851      4D504C5F 
+ 2852              	.LASF51:
+ 2853 1359 4359424C 		.ascii	"CYBLE_EVT_GATT_DISCONNECT_IND\000"
+ 2853      455F4556 
+ 2853      545F4741 
+ 2853      54545F44 
+ 2853      4953434F 
+ 2854              	.LASF107:
+ 2855 1377 4359424C 		.ascii	"CYBLE_ERROR_GATT_DB_INVALID_ATTR_HANDLE\000"
+ 2855      455F4552 
+ 2855      524F525F 
+ 2855      47415454 
+ 2855      5F44425F 
+ 2856              	.LASF174:
+ 2857 139f 746F7461 		.ascii	"total_len\000"
+ 2857      6C5F6C65 
+ 2857      6E00
+ 2858              	.LASF189:
+ 2859 13a9 6D656D63 		.ascii	"memcmp\000"
+ 2859      6D7000
+ 2860              	.LASF124:
+ 2861 13b0 4359424C 		.ascii	"CYBLE_GAPC_CONN_UNDIRECTED_ADV\000"
+ 2861      455F4741 
+ 2861      50435F43 
+ 2861      4F4E4E5F 
+ 2861      554E4449 
+ 2862              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

@@ -1,0 +1,558 @@
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"cymetadata.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	cy_meta_chipprotect
+  18              		.global	cy_metadata
+  19              		.global	cy_meta_flashprotect
+  20              		.section	.cychipprotect,"a",%progbits
+  21              		.align	2
+  22              		.type	cy_meta_chipprotect, %object
+  23              		.size	cy_meta_chipprotect, 1
+  24              	cy_meta_chipprotect:
+  25 0000 01       		.byte	1
+  26 0001 000000   		.section	.cymeta,"a",%progbits
+  27              		.align	2
+  28              		.type	cy_metadata, %object
+  29              		.size	cy_metadata, 12
+  30              	cy_metadata:
+  31 0000 00       		.byte	0
+  32 0001 02       		.byte	2
+  33 0002 0E       		.byte	14
+  34 0003 09       		.byte	9
+  35 0004 11       		.byte	17
+  36 0005 9E       		.byte	-98
+  37 0006 00       		.byte	0
+  38 0007 00       		.byte	0
+  39 0008 00       		.byte	0
+  40 0009 00       		.byte	0
+  41 000a 00       		.byte	0
+  42 000b 00       		.byte	0
+  43              		.section	.cyflashprotect,"a",%progbits
+  44              		.align	2
+  45              		.type	cy_meta_flashprotect, %object
+  46              		.size	cy_meta_flashprotect, 128
+  47              	cy_meta_flashprotect:
+  48 0000 FF       		.byte	-1
+  49 0001 FF       		.byte	-1
+  50 0002 FF       		.byte	-1
+  51 0003 FF       		.byte	-1
+  52 0004 FF       		.byte	-1
+  53 0005 FF       		.byte	-1
+  54 0006 FF       		.byte	-1
+  55 0007 FF       		.byte	-1
+  56 0008 FF       		.byte	-1
+  57 0009 FF       		.byte	-1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 2
+
+
+  58 000a FF       		.byte	-1
+  59 000b FF       		.byte	-1
+  60 000c FF       		.byte	-1
+  61 000d FF       		.byte	-1
+  62 000e FF       		.byte	-1
+  63 000f FF       		.byte	-1
+  64 0010 FF       		.byte	-1
+  65 0011 FF       		.byte	-1
+  66 0012 FF       		.byte	-1
+  67 0013 FF       		.byte	-1
+  68 0014 FF       		.byte	-1
+  69 0015 FF       		.byte	-1
+  70 0016 FF       		.byte	-1
+  71 0017 FF       		.byte	-1
+  72 0018 FF       		.byte	-1
+  73 0019 FF       		.byte	-1
+  74 001a FF       		.byte	-1
+  75 001b FF       		.byte	-1
+  76 001c FF       		.byte	-1
+  77 001d FF       		.byte	-1
+  78 001e FF       		.byte	-1
+  79 001f FF       		.byte	-1
+  80 0020 FF       		.byte	-1
+  81 0021 FF       		.byte	-1
+  82 0022 FF       		.byte	-1
+  83 0023 FF       		.byte	-1
+  84 0024 FF       		.byte	-1
+  85 0025 FF       		.byte	-1
+  86 0026 FF       		.byte	-1
+  87 0027 FF       		.byte	-1
+  88 0028 FF       		.byte	-1
+  89 0029 FF       		.byte	-1
+  90 002a FF       		.byte	-1
+  91 002b FF       		.byte	-1
+  92 002c FF       		.byte	-1
+  93 002d FF       		.byte	-1
+  94 002e FF       		.byte	-1
+  95 002f FF       		.byte	-1
+  96 0030 FF       		.byte	-1
+  97 0031 FF       		.byte	-1
+  98 0032 FF       		.byte	-1
+  99 0033 FF       		.byte	-1
+ 100 0034 FF       		.byte	-1
+ 101 0035 FF       		.byte	-1
+ 102 0036 FF       		.byte	-1
+ 103 0037 FF       		.byte	-1
+ 104 0038 FF       		.byte	-1
+ 105 0039 FF       		.byte	-1
+ 106 003a FF       		.byte	-1
+ 107 003b FF       		.byte	-1
+ 108 003c FF       		.byte	-1
+ 109 003d FF       		.byte	-1
+ 110 003e FF       		.byte	-1
+ 111 003f FF       		.byte	-1
+ 112 0040 FF       		.byte	-1
+ 113 0041 FF       		.byte	-1
+ 114 0042 FF       		.byte	-1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 3
+
+
+ 115 0043 FF       		.byte	-1
+ 116 0044 FF       		.byte	-1
+ 117 0045 FF       		.byte	-1
+ 118 0046 FF       		.byte	-1
+ 119 0047 FF       		.byte	-1
+ 120 0048 FF       		.byte	-1
+ 121 0049 FF       		.byte	-1
+ 122 004a FF       		.byte	-1
+ 123 004b FF       		.byte	-1
+ 124 004c FF       		.byte	-1
+ 125 004d FF       		.byte	-1
+ 126 004e FF       		.byte	-1
+ 127 004f FF       		.byte	-1
+ 128 0050 FF       		.byte	-1
+ 129 0051 FF       		.byte	-1
+ 130 0052 FF       		.byte	-1
+ 131 0053 FF       		.byte	-1
+ 132 0054 FF       		.byte	-1
+ 133 0055 FF       		.byte	-1
+ 134 0056 FF       		.byte	-1
+ 135 0057 FF       		.byte	-1
+ 136 0058 FF       		.byte	-1
+ 137 0059 FF       		.byte	-1
+ 138 005a FF       		.byte	-1
+ 139 005b FF       		.byte	-1
+ 140 005c FF       		.byte	-1
+ 141 005d FF       		.byte	-1
+ 142 005e FF       		.byte	-1
+ 143 005f FF       		.byte	-1
+ 144 0060 FF       		.byte	-1
+ 145 0061 FF       		.byte	-1
+ 146 0062 FF       		.byte	-1
+ 147 0063 FF       		.byte	-1
+ 148 0064 FF       		.byte	-1
+ 149 0065 FF       		.byte	-1
+ 150 0066 FF       		.byte	-1
+ 151 0067 FF       		.byte	-1
+ 152 0068 FF       		.byte	-1
+ 153 0069 FF       		.byte	-1
+ 154 006a FF       		.byte	-1
+ 155 006b FF       		.byte	-1
+ 156 006c FF       		.byte	-1
+ 157 006d FF       		.byte	-1
+ 158 006e FF       		.byte	-1
+ 159 006f FF       		.byte	-1
+ 160 0070 FF       		.byte	-1
+ 161 0071 FF       		.byte	-1
+ 162 0072 FF       		.byte	-1
+ 163 0073 FF       		.byte	-1
+ 164 0074 FF       		.byte	-1
+ 165 0075 FF       		.byte	-1
+ 166 0076 FF       		.byte	-1
+ 167 0077 FF       		.byte	-1
+ 168 0078 FF       		.byte	-1
+ 169 0079 FF       		.byte	-1
+ 170 007a FF       		.byte	-1
+ 171 007b FF       		.byte	-1
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 4
+
+
+ 172 007c FF       		.byte	-1
+ 173 007d FF       		.byte	-1
+ 174 007e FF       		.byte	-1
+ 175 007f FF       		.byte	-1
+ 176              		.text
+ 177              	.Letext0:
+ 178              		.file 1 ".\\Generated_Source\\PSoC4\\cymetadata.c"
+ 179              		.file 2 ".\\Generated_Source\\PSoC4\\cytypes.h"
+ 180              		.section	.debug_info,"",%progbits
+ 181              	.Ldebug_info0:
+ 182 0000 FA000000 		.4byte	0xfa
+ 183 0004 0400     		.2byte	0x4
+ 184 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 185 000a 04       		.byte	0x4
+ 186 000b 01       		.uleb128 0x1
+ 187 000c 40010000 		.4byte	.LASF16
+ 188 0010 01       		.byte	0x1
+ 189 0011 C5000000 		.4byte	.LASF17
+ 190 0015 26000000 		.4byte	.LASF18
+ 191 0019 00000000 		.4byte	.Ldebug_line0
+ 192 001d 02       		.uleb128 0x2
+ 193 001e 01       		.byte	0x1
+ 194 001f 06       		.byte	0x6
+ 195 0020 E7010000 		.4byte	.LASF0
+ 196 0024 02       		.uleb128 0x2
+ 197 0025 01       		.byte	0x1
+ 198 0026 08       		.byte	0x8
+ 199 0027 8B000000 		.4byte	.LASF1
+ 200 002b 02       		.uleb128 0x2
+ 201 002c 02       		.byte	0x2
+ 202 002d 05       		.byte	0x5
+ 203 002e CE010000 		.4byte	.LASF2
+ 204 0032 02       		.uleb128 0x2
+ 205 0033 02       		.byte	0x2
+ 206 0034 07       		.byte	0x7
+ 207 0035 AB000000 		.4byte	.LASF3
+ 208 0039 02       		.uleb128 0x2
+ 209 003a 04       		.byte	0x4
+ 210 003b 05       		.byte	0x5
+ 211 003c DE010000 		.4byte	.LASF4
+ 212 0040 02       		.uleb128 0x2
+ 213 0041 04       		.byte	0x4
+ 214 0042 07       		.byte	0x7
+ 215 0043 99000000 		.4byte	.LASF5
+ 216 0047 02       		.uleb128 0x2
+ 217 0048 08       		.byte	0x8
+ 218 0049 05       		.byte	0x5
+ 219 004a 2D010000 		.4byte	.LASF6
+ 220 004e 02       		.uleb128 0x2
+ 221 004f 08       		.byte	0x8
+ 222 0050 07       		.byte	0x7
+ 223 0051 F8000000 		.4byte	.LASF7
+ 224 0055 03       		.uleb128 0x3
+ 225 0056 04       		.byte	0x4
+ 226 0057 05       		.byte	0x5
+ 227 0058 696E7400 		.ascii	"int\000"
+ 228 005c 02       		.uleb128 0x2
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 5
+
+
+ 229 005d 04       		.byte	0x4
+ 230 005e 07       		.byte	0x7
+ 231 005f EB000000 		.4byte	.LASF8
+ 232 0063 04       		.uleb128 0x4
+ 233 0064 D8010000 		.4byte	.LASF19
+ 234 0068 02       		.byte	0x2
+ 235 0069 3801     		.2byte	0x138
+ 236 006b 24000000 		.4byte	0x24
+ 237 006f 02       		.uleb128 0x2
+ 238 0070 04       		.byte	0x4
+ 239 0071 04       		.byte	0x4
+ 240 0072 20000000 		.4byte	.LASF9
+ 241 0076 02       		.uleb128 0x2
+ 242 0077 08       		.byte	0x8
+ 243 0078 04       		.byte	0x4
+ 244 0079 BE000000 		.4byte	.LASF10
+ 245 007d 02       		.uleb128 0x2
+ 246 007e 01       		.byte	0x1
+ 247 007f 08       		.byte	0x8
+ 248 0080 3B010000 		.4byte	.LASF11
+ 249 0084 05       		.uleb128 0x5
+ 250 0085 63000000 		.4byte	0x63
+ 251 0089 94000000 		.4byte	0x94
+ 252 008d 06       		.uleb128 0x6
+ 253 008e 94000000 		.4byte	0x94
+ 254 0092 7F       		.byte	0x7f
+ 255 0093 00       		.byte	0
+ 256 0094 02       		.uleb128 0x2
+ 257 0095 04       		.byte	0x4
+ 258 0096 07       		.byte	0x7
+ 259 0097 24010000 		.4byte	.LASF12
+ 260 009b 07       		.uleb128 0x7
+ 261 009c 0F010000 		.4byte	.LASF13
+ 262 00a0 01       		.byte	0x1
+ 263 00a1 1F       		.byte	0x1f
+ 264 00a2 AC000000 		.4byte	0xac
+ 265 00a6 05       		.uleb128 0x5
+ 266 00a7 03       		.byte	0x3
+ 267 00a8 00000000 		.4byte	cy_meta_flashprotect
+ 268 00ac 08       		.uleb128 0x8
+ 269 00ad 84000000 		.4byte	0x84
+ 270 00b1 05       		.uleb128 0x5
+ 271 00b2 63000000 		.4byte	0x63
+ 272 00b6 C1000000 		.4byte	0xc1
+ 273 00ba 06       		.uleb128 0x6
+ 274 00bb 94000000 		.4byte	0x94
+ 275 00bf 0B       		.byte	0xb
+ 276 00c0 00       		.byte	0
+ 277 00c1 07       		.uleb128 0x7
+ 278 00c2 14000000 		.4byte	.LASF14
+ 279 00c6 01       		.byte	0x1
+ 280 00c7 3C       		.byte	0x3c
+ 281 00c8 D2000000 		.4byte	0xd2
+ 282 00cc 05       		.uleb128 0x5
+ 283 00cd 03       		.byte	0x3
+ 284 00ce 00000000 		.4byte	cy_metadata
+ 285 00d2 08       		.uleb128 0x8
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 6
+
+
+ 286 00d3 B1000000 		.4byte	0xb1
+ 287 00d7 05       		.uleb128 0x5
+ 288 00d8 63000000 		.4byte	0x63
+ 289 00dc E7000000 		.4byte	0xe7
+ 290 00e0 06       		.uleb128 0x6
+ 291 00e1 94000000 		.4byte	0x94
+ 292 00e5 00       		.byte	0
+ 293 00e6 00       		.byte	0
+ 294 00e7 07       		.uleb128 0x7
+ 295 00e8 00000000 		.4byte	.LASF15
+ 296 00ec 01       		.byte	0x1
+ 297 00ed 4B       		.byte	0x4b
+ 298 00ee F8000000 		.4byte	0xf8
+ 299 00f2 05       		.uleb128 0x5
+ 300 00f3 03       		.byte	0x3
+ 301 00f4 00000000 		.4byte	cy_meta_chipprotect
+ 302 00f8 08       		.uleb128 0x8
+ 303 00f9 D7000000 		.4byte	0xd7
+ 304 00fd 00       		.byte	0
+ 305              		.section	.debug_abbrev,"",%progbits
+ 306              	.Ldebug_abbrev0:
+ 307 0000 01       		.uleb128 0x1
+ 308 0001 11       		.uleb128 0x11
+ 309 0002 01       		.byte	0x1
+ 310 0003 25       		.uleb128 0x25
+ 311 0004 0E       		.uleb128 0xe
+ 312 0005 13       		.uleb128 0x13
+ 313 0006 0B       		.uleb128 0xb
+ 314 0007 03       		.uleb128 0x3
+ 315 0008 0E       		.uleb128 0xe
+ 316 0009 1B       		.uleb128 0x1b
+ 317 000a 0E       		.uleb128 0xe
+ 318 000b 10       		.uleb128 0x10
+ 319 000c 17       		.uleb128 0x17
+ 320 000d 00       		.byte	0
+ 321 000e 00       		.byte	0
+ 322 000f 02       		.uleb128 0x2
+ 323 0010 24       		.uleb128 0x24
+ 324 0011 00       		.byte	0
+ 325 0012 0B       		.uleb128 0xb
+ 326 0013 0B       		.uleb128 0xb
+ 327 0014 3E       		.uleb128 0x3e
+ 328 0015 0B       		.uleb128 0xb
+ 329 0016 03       		.uleb128 0x3
+ 330 0017 0E       		.uleb128 0xe
+ 331 0018 00       		.byte	0
+ 332 0019 00       		.byte	0
+ 333 001a 03       		.uleb128 0x3
+ 334 001b 24       		.uleb128 0x24
+ 335 001c 00       		.byte	0
+ 336 001d 0B       		.uleb128 0xb
+ 337 001e 0B       		.uleb128 0xb
+ 338 001f 3E       		.uleb128 0x3e
+ 339 0020 0B       		.uleb128 0xb
+ 340 0021 03       		.uleb128 0x3
+ 341 0022 08       		.uleb128 0x8
+ 342 0023 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 7
+
+
+ 343 0024 00       		.byte	0
+ 344 0025 04       		.uleb128 0x4
+ 345 0026 16       		.uleb128 0x16
+ 346 0027 00       		.byte	0
+ 347 0028 03       		.uleb128 0x3
+ 348 0029 0E       		.uleb128 0xe
+ 349 002a 3A       		.uleb128 0x3a
+ 350 002b 0B       		.uleb128 0xb
+ 351 002c 3B       		.uleb128 0x3b
+ 352 002d 05       		.uleb128 0x5
+ 353 002e 49       		.uleb128 0x49
+ 354 002f 13       		.uleb128 0x13
+ 355 0030 00       		.byte	0
+ 356 0031 00       		.byte	0
+ 357 0032 05       		.uleb128 0x5
+ 358 0033 01       		.uleb128 0x1
+ 359 0034 01       		.byte	0x1
+ 360 0035 49       		.uleb128 0x49
+ 361 0036 13       		.uleb128 0x13
+ 362 0037 01       		.uleb128 0x1
+ 363 0038 13       		.uleb128 0x13
+ 364 0039 00       		.byte	0
+ 365 003a 00       		.byte	0
+ 366 003b 06       		.uleb128 0x6
+ 367 003c 21       		.uleb128 0x21
+ 368 003d 00       		.byte	0
+ 369 003e 49       		.uleb128 0x49
+ 370 003f 13       		.uleb128 0x13
+ 371 0040 2F       		.uleb128 0x2f
+ 372 0041 0B       		.uleb128 0xb
+ 373 0042 00       		.byte	0
+ 374 0043 00       		.byte	0
+ 375 0044 07       		.uleb128 0x7
+ 376 0045 34       		.uleb128 0x34
+ 377 0046 00       		.byte	0
+ 378 0047 03       		.uleb128 0x3
+ 379 0048 0E       		.uleb128 0xe
+ 380 0049 3A       		.uleb128 0x3a
+ 381 004a 0B       		.uleb128 0xb
+ 382 004b 3B       		.uleb128 0x3b
+ 383 004c 0B       		.uleb128 0xb
+ 384 004d 49       		.uleb128 0x49
+ 385 004e 13       		.uleb128 0x13
+ 386 004f 3F       		.uleb128 0x3f
+ 387 0050 19       		.uleb128 0x19
+ 388 0051 02       		.uleb128 0x2
+ 389 0052 18       		.uleb128 0x18
+ 390 0053 00       		.byte	0
+ 391 0054 00       		.byte	0
+ 392 0055 08       		.uleb128 0x8
+ 393 0056 26       		.uleb128 0x26
+ 394 0057 00       		.byte	0
+ 395 0058 49       		.uleb128 0x49
+ 396 0059 13       		.uleb128 0x13
+ 397 005a 00       		.byte	0
+ 398 005b 00       		.byte	0
+ 399 005c 00       		.byte	0
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 8
+
+
+ 400              		.section	.debug_aranges,"",%progbits
+ 401 0000 14000000 		.4byte	0x14
+ 402 0004 0200     		.2byte	0x2
+ 403 0006 00000000 		.4byte	.Ldebug_info0
+ 404 000a 04       		.byte	0x4
+ 405 000b 00       		.byte	0
+ 406 000c 0000     		.2byte	0
+ 407 000e 0000     		.2byte	0
+ 408 0010 00000000 		.4byte	0
+ 409 0014 00000000 		.4byte	0
+ 410              		.section	.debug_line,"",%progbits
+ 411              	.Ldebug_line0:
+ 412 0000 4F000000 		.section	.debug_str,"MS",%progbits,1
+ 412      02004900 
+ 412      00000201 
+ 412      FB0E0D00 
+ 412      01010101 
+ 413              	.LASF15:
+ 414 0000 63795F6D 		.ascii	"cy_meta_chipprotect\000"
+ 414      6574615F 
+ 414      63686970 
+ 414      70726F74 
+ 414      65637400 
+ 415              	.LASF14:
+ 416 0014 63795F6D 		.ascii	"cy_metadata\000"
+ 416      65746164 
+ 416      61746100 
+ 417              	.LASF9:
+ 418 0020 666C6F61 		.ascii	"float\000"
+ 418      7400
+ 419              	.LASF18:
+ 420 0026 473A5C50 		.ascii	"G:\\Project\\LiYangLiu--HanJiang Meter\\Troughpur_C"
+ 420      726F6A65 
+ 420      63745C4C 
+ 420      6959616E 
+ 420      674C6975 
+ 421 0056 656E7472 		.ascii	"entral_Peripheral\\Troughput_Central_Peripheral.cyd"
+ 421      616C5F50 
+ 421      65726970 
+ 421      68657261 
+ 421      6C5C5472 
+ 422 0088 736E00   		.ascii	"sn\000"
+ 423              	.LASF1:
+ 424 008b 756E7369 		.ascii	"unsigned char\000"
+ 424      676E6564 
+ 424      20636861 
+ 424      7200
+ 425              	.LASF5:
+ 426 0099 6C6F6E67 		.ascii	"long unsigned int\000"
+ 426      20756E73 
+ 426      69676E65 
+ 426      6420696E 
+ 426      7400
+ 427              	.LASF3:
+ 428 00ab 73686F72 		.ascii	"short unsigned int\000"
+ 428      7420756E 
+ 428      7369676E 
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 9
+
+
+ 428      65642069 
+ 428      6E7400
+ 429              	.LASF10:
+ 430 00be 646F7562 		.ascii	"double\000"
+ 430      6C6500
+ 431              	.LASF17:
+ 432 00c5 2E5C4765 		.ascii	".\\Generated_Source\\PSoC4\\cymetadata.c\000"
+ 432      6E657261 
+ 432      7465645F 
+ 432      536F7572 
+ 432      63655C50 
+ 433              	.LASF8:
+ 434 00eb 756E7369 		.ascii	"unsigned int\000"
+ 434      676E6564 
+ 434      20696E74 
+ 434      00
+ 435              	.LASF7:
+ 436 00f8 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 436      206C6F6E 
+ 436      6720756E 
+ 436      7369676E 
+ 436      65642069 
+ 437              	.LASF13:
+ 438 010f 63795F6D 		.ascii	"cy_meta_flashprotect\000"
+ 438      6574615F 
+ 438      666C6173 
+ 438      6870726F 
+ 438      74656374 
+ 439              	.LASF12:
+ 440 0124 73697A65 		.ascii	"sizetype\000"
+ 440      74797065 
+ 440      00
+ 441              	.LASF6:
+ 442 012d 6C6F6E67 		.ascii	"long long int\000"
+ 442      206C6F6E 
+ 442      6720696E 
+ 442      7400
+ 443              	.LASF11:
+ 444 013b 63686172 		.ascii	"char\000"
+ 444      00
+ 445              	.LASF16:
+ 446 0140 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 446      4320342E 
+ 446      392E3320 
+ 446      32303135 
+ 446      30333033 
+ 447 0173 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m0 -mthumb -g -O"
+ 447      20726576 
+ 447      6973696F 
+ 447      6E203232 
+ 447      31323230 
+ 448 01a6 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 448      66756E63 
+ 448      74696F6E 
+ 448      2D736563 
+ 448      74696F6E 
+ 449              	.LASF2:
+ARM GAS  C:\Users\Helon\AppData\Local\Temp\cc0jEneJ.s 			page 10
+
+
+ 450 01ce 73686F72 		.ascii	"short int\000"
+ 450      7420696E 
+ 450      7400
+ 451              	.LASF19:
+ 452 01d8 75696E74 		.ascii	"uint8\000"
+ 452      3800
+ 453              	.LASF4:
+ 454 01de 6C6F6E67 		.ascii	"long int\000"
+ 454      20696E74 
+ 454      00
+ 455              	.LASF0:
+ 456 01e7 7369676E 		.ascii	"signed char\000"
+ 456      65642063 
+ 456      68617200 
+ 457              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br
